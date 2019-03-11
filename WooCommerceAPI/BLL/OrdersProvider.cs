@@ -158,5 +158,39 @@ namespace WooCommerceAPI.BLL
                 return 0;
             }
         }
+
+        public string AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate)
+        {
+            List<StockCopyDTO> orderItems = JsonConvert.DeserializeObject<List<StockCopyDTO>>(jsonBoxOrderCreate);
+            OrderDTO orderObject = JsonConvert.DeserializeObject<OrderDTO>(jsonOrder);
+            return _ordersRepository.AssignOrderItems(orderID, orderItems, orderObject);
+        }
+
+        public string GetOrder(string orderID)
+        {
+            try
+            {
+                var order = _ordersRepository.GetOrder(orderID);
+                string json = JsonConvert.SerializeObject(order);
+                return json;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public string UpdateAllocatedStock(string jsonBoxOrderCreate)
+        {
+            try
+            {
+                OrderDTO orderObject = JsonConvert.DeserializeObject<OrderDTO>(jsonBoxOrderCreate);
+                return "";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
     }
 }

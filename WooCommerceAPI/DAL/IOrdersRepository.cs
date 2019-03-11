@@ -16,5 +16,6 @@ namespace WooCommerceAPI.DAL
         string RemoveCompletedOrders();
         string ModifyOrderStatus(string orderID, string statusType);
         OrderDTO GetOrder(string orderID);
+        string AssignOrderItems(string orderID, List<StockCopyDTO> orderItems, OrderDTO orderObject);
     }
 }

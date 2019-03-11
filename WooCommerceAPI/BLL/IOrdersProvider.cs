@@ -11,5 +11,8 @@ namespace WooCommerceAPI.BLL
         string RemoveCompletedOrders();
         string ModifyOrderStatus(string orderID, string statusType);
         string BoxOrderCreate(string orderID);
+        string AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate);
+        string GetOrder(string orderID);
+        string UpdateAllocatedStock(string jsonBoxOrderCreate);
     }
 }

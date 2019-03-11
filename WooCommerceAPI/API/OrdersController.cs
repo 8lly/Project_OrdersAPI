@@ -58,6 +58,20 @@ namespace WooCommerceAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("GetOrder")]
+        public string GetOrder(string orderID)
+        {
+            try
+            {
+                return _ordersProvider.GetOrder(orderID);
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
         [HttpPost]
         [Route("ImportOrder")]
         public string CreateOrderDocument(Order newOrder)
@@ -65,6 +79,37 @@ namespace WooCommerceAPI.Controllers
             try
             {
                 return _ordersProvider.CreateOrderDocument(newOrder);
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        [HttpPost]
+        [Route("SaveOrderUpdateStock")]
+        public string OrderAndStockUpdate(string orderID)
+        {
+            try
+            {
+                string jsonOrder = GetOrder(orderID);
+                string jsonBoxOrderCreate = BoxOrderCreate(orderID);
+                try
+                {
+                     _ordersProvider.AssignOrderItems(orderID, jsonOrder, jsonBoxOrderCreate);
+                    try
+                    {
+                        return _ordersProvider.UpdateAllocatedStock(jsonBoxOrderCreate);
+                    }
+                    catch (Exception ex)
+                    {
+                        return ex.Message;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return ex.Message;
+                }
             }
             catch (Exception ex)
             {

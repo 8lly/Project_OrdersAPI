@@ -99,5 +99,26 @@ namespace WooCommerceAPI.DAL
         {
             return _order.Find(OrderDTO => OrderDTO.Id == orderID).FirstOrDefault();
         }
+
+        public string AssignOrderItems(string orderID, List<StockCopyDTO> orderItems, OrderDTO orderObject)
+        {
+            OrderDTO modifiedOrder = _order.Find(OrderDTO => OrderDTO.Id == orderID).FirstOrDefault();
+            modifiedOrder.ItemOneID = orderItems[0].Product_Title;
+            modifiedOrder.ItemTwoID = orderItems[1].Product_Title;
+            modifiedOrder.ItemThreeID = orderItems[2].Product_Title;
+            modifiedOrder.ItemFourID = orderItems[3].Product_Title;
+            modifiedOrder.ItemFiveID = orderItems[4].Product_Title;
+            modifiedOrder.ItemSixID = orderItems[5].Product_Title;
+            if (orderItems.Count > 6)
+            {
+                modifiedOrder.ItemSevenID = orderItems[6].Product_Title;
+            }
+            if (orderItems.Count > 7)
+            {
+                modifiedOrder.ItemEightID = orderItems[7].Product_Title;
+            }
+            _order.ReplaceOneAsync(x => x.Id == modifiedOrder.Id, modifiedOrder);
+            return "Order record has been updated with allocated items";
+        }
     }
 }
