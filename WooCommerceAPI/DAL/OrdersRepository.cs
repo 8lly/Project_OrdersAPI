@@ -12,6 +12,7 @@ using System.IO;
 using MongoDB.Bson.IO;
 using System.Text;
 using OrdersAPI.Models;
+using StockAPI.Models;
 
 namespace WooCommerceAPI.DAL
 {

@@ -1,4 +1,5 @@
 ﻿using OrdersAPI.Models;
+using StockAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

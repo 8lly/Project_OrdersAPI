@@ -96,15 +96,7 @@ namespace WooCommerceAPI.Controllers
                 string jsonBoxOrderCreate = BoxOrderCreate(orderID);
                 try
                 {
-                     _ordersProvider.AssignOrderItems(orderID, jsonOrder, jsonBoxOrderCreate);
-                    try
-                    {
-                        return _ordersProvider.UpdateAllocatedStock(jsonBoxOrderCreate);
-                    }
-                    catch (Exception ex)
-                    {
-                        return ex.Message;
-                    }
+                    return _ordersProvider.AssignOrderItems(orderID, jsonOrder, jsonBoxOrderCreate);
                 }
                 catch (Exception ex)
                 {

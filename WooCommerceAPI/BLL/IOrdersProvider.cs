@@ -1,5 +1,6 @@
 ﻿using OrdersAPI.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace WooCommerceAPI.BLL
 {
@@ -13,6 +14,5 @@ namespace WooCommerceAPI.BLL
         string BoxOrderCreate(string orderID);
         string AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate);
         string GetOrder(string orderID);
-        string UpdateAllocatedStock(string jsonBoxOrderCreate);
     }
 }
