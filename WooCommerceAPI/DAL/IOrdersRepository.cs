@@ -18,5 +18,6 @@ namespace WooCommerceAPI.DAL
         string ModifyOrderStatus(string orderID, string statusType);
         OrderDTO GetOrder(string orderID);
         string AssignOrderItems(string orderID, List<StockCopyDTO> orderItems, OrderDTO orderObject);
+        OrderDTO RemoveOrder(string orderID);
     }
 }

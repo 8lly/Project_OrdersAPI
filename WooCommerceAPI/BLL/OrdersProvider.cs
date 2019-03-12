@@ -3,11 +3,10 @@ using OrdersAPI.Models;
 using StockAPI.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Http;
 using WooCommerceAPI.DAL;
 
 namespace WooCommerceAPI.BLL
@@ -135,5 +134,58 @@ namespace WooCommerceAPI.BLL
                 return ex.Message;
             }
         }
+
+        public string RemoveOrder(string orderID)
+        {
+            try
+            {
+                // Delete record, save copy to return freed stock
+                OrderDTO removedOrder = _ordersRepository.RemoveOrder(orderID);
+                // Stock items returning to stock db
+                List<string> allocatedItems = new List<string>()
+                {
+                    removedOrder.ItemOneName,
+                    removedOrder.ItemTwoName,
+                    removedOrder.ItemThreeName,
+                    removedOrder.ItemFourName,
+                    removedOrder.ItemFiveName,
+                    removedOrder.ItemSixName,
+                    removedOrder.ItemSevenName,
+                    removedOrder.ItemEightName,
+                };
+
+                // Remove nulls from list 
+                // allocatedItems.RemoveAll(string.IsNullOrWhiteSpace);
+
+                await ReallocatedRemovedOrderStock(allocatedItems);
+
+                string json = JsonConvert.SerializeObject(allocatedItems);
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public async Task <List<string>> ReallocatedRemovedOrderStock(List<string> reallocatedStockList)
+        {
+
+            HttpClient client = new HttpClient();
+            string requestURI = "http://localhost:55001/api/Stock/UpdateStockAddAllocation";
+
+            for (int x = 0; x < reallocatedStockList.Count; x++)
+            {
+                
+                var jsonRequest = JsonConvert.SerializeObject(reallocatedStockList[x]);
+                var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await client.PostAsync(requestURI, content);
+            }
+
+            return new List<string>();
+ 
     }
+}
 }

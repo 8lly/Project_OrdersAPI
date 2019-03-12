@@ -87,8 +87,8 @@ namespace WooCommerceAPI.Controllers
         }
 
         [HttpPost]
-        [Route("SaveOrderUpdateStock")]
-        public string OrderAndStockUpdate(string orderID)
+        [Route("AssignOrderItems")]
+        public string AssignOrderItems(string orderID)
         {
             try
             {
@@ -150,5 +150,36 @@ namespace WooCommerceAPI.Controllers
                 return ex.Message;
             }
         }
+
+        [HttpDelete]
+        [Route("RemoveOrder")]
+        public string RemoveOrder(string orderID)
+        {
+            try
+            {
+                string reallocatedStock = _ordersProvider.RemoveOrder(orderID);
+                return "";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        /*
+        [HttpPatch]
+        [Route("ReallocatedRemovedOrderStock")]
+        public async Task<string> ReallocatedRemovedOrderStock(string reallocatedStock)
+        {
+            try
+            {
+                return await _ordersProvider.ReallocatedRemovedOrderStock(reallocatedStock);
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+        */
     }
 }

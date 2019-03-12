@@ -37,28 +37,28 @@ namespace OrdersAPI.Models
         public DateTime Order_Created { get; set; }
 
         [BsonElement("item_1")]
-        public string ItemOneID { get; set; }
+        public string ItemOneName { get; set; }
 
         [BsonElement("item_2")]
-        public string ItemTwoID { get; set; }
+        public string ItemTwoName { get; set; }
 
         [BsonElement("item_3")]
-        public string ItemThreeID { get; set; }
+        public string ItemThreeName { get; set; }
 
         [BsonElement("item_4")]
-        public string ItemFourID { get; set; }
+        public string ItemFourName { get; set; }
 
         [BsonElement("item_5")]
-        public string ItemFiveID { get; set; }
+        public string ItemFiveName { get; set; }
 
         [BsonElement("item_6")]
-        public string ItemSixID { get; set; }
+        public string ItemSixName { get; set; }
 
         [BsonElement("item_7")]
-        public string ItemSevenID { get; set; }
+        public string ItemSevenName { get; set; }
 
         [BsonElement("item_8")]
-        public string ItemEightID { get; set; }
+        public string ItemEightName { get; set; }
 
     }
 }

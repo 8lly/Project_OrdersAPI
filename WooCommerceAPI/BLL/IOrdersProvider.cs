@@ -14,5 +14,7 @@ namespace WooCommerceAPI.BLL
         string BoxOrderCreate(string orderID);
         string AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate);
         string GetOrder(string orderID);
+        string RemoveOrder(string orderID);
+        Task<List<string>> ReallocatedRemovedOrderStock(List<string> reallocatedStock);
     }
 }
