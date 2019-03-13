@@ -157,7 +157,7 @@ namespace WooCommerceAPI.BLL
                 // Remove nulls from list 
                 // allocatedItems.RemoveAll(string.IsNullOrWhiteSpace);
 
-                await ReallocatedRemovedOrderStock(allocatedItems);
+                ReallocatedRemovedOrderStock(allocatedItems);
 
                 string json = JsonConvert.SerializeObject(allocatedItems);
                 return json;
@@ -177,11 +177,10 @@ namespace WooCommerceAPI.BLL
 
             for (int x = 0; x < reallocatedStockList.Count; x++)
             {
-                
-                var jsonRequest = JsonConvert.SerializeObject(reallocatedStockList[x]);
-                var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+                // How to get rid of this?
+                var content = new StringContent("");
 
-                HttpResponseMessage response = await client.PostAsync(requestURI, content);
+                HttpResponseMessage response = await client.PostAsync($"{requestURI}/?body={reallocatedStockList[x]}", content);
             }
 
             return new List<string>();
