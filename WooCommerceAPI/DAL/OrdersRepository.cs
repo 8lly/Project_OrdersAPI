@@ -67,7 +67,7 @@ namespace WooCommerceAPI.DAL
             try
             {
                 _order.InsertOne(newOrderDTO);
-                return "New item Inserted, Stock ID: " + newOrderDTO.Id.ToString();
+                return "New item Inserted";
             }
             catch (Exception ex)
             {
@@ -103,23 +103,30 @@ namespace WooCommerceAPI.DAL
 
         public string AssignOrderItems(string orderID, List<StockCopyDTO> orderItems, OrderDTO orderObject)
         {
-            OrderDTO modifiedOrder = _order.Find(OrderDTO => OrderDTO.Id == orderID).FirstOrDefault();
-            modifiedOrder.ItemOneName = orderItems[0].Product_Title;
-            modifiedOrder.ItemTwoName = orderItems[1].Product_Title;
-            modifiedOrder.ItemThreeName = orderItems[2].Product_Title;
-            modifiedOrder.ItemFourName = orderItems[3].Product_Title;
-            modifiedOrder.ItemFiveName = orderItems[4].Product_Title;
-            modifiedOrder.ItemSixName = orderItems[5].Product_Title;
-            if (orderItems.Count > 6)
+            try
             {
-                modifiedOrder.ItemSevenName = orderItems[6].Product_Title;
+                OrderDTO modifiedOrder = _order.Find(OrderDTO => OrderDTO.Id == orderID).FirstOrDefault();
+                modifiedOrder.ItemOneName = orderItems[0].Product_Title;
+                modifiedOrder.ItemTwoName = orderItems[1].Product_Title;
+                modifiedOrder.ItemThreeName = orderItems[2].Product_Title;
+                modifiedOrder.ItemFourName = orderItems[3].Product_Title;
+                modifiedOrder.ItemFiveName = orderItems[4].Product_Title;
+                modifiedOrder.ItemSixName = orderItems[5].Product_Title;
+                if (orderItems.Count > 6)
+                {
+                    modifiedOrder.ItemSevenName = orderItems[6].Product_Title;
+                }
+                if (orderItems.Count > 7)
+                {
+                    modifiedOrder.ItemEightName = orderItems[7].Product_Title;
+                }
+                _order.ReplaceOneAsync(x => x.Id == modifiedOrder.Id, modifiedOrder);
+                return "Order record has been updated with allocated items";
             }
-            if (orderItems.Count > 7)
+            catch (Exception ex)
             {
-                modifiedOrder.ItemEightName = orderItems[7].Product_Title;
+                return (ex.ToString() + ":- Error with database. Please contact an system administrator.");
             }
-            _order.ReplaceOneAsync(x => x.Id == modifiedOrder.Id, modifiedOrder);
-            return "Order record has been updated with allocated items";
         }
 
         public OrderDTO RemoveOrder(string orderID)

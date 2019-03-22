@@ -60,5 +60,17 @@ namespace OrdersAPI.Models
         [BsonElement("item_8")]
         public string ItemEightName { get; set; }
 
+        public bool IsValid()
+        {
+            if (!String.IsNullOrEmpty(Order_Number) &&
+                (!String.IsNullOrEmpty(Customer_First)) &&
+                (!String.IsNullOrEmpty(Customer_Last)) &&
+                (!String.IsNullOrEmpty(SKU)) &&
+                (!String.IsNullOrEmpty(Status)))
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

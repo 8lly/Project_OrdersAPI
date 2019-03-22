@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using OrdersAPI.Models;
 using StockAPI.Models;
 using System;
@@ -50,25 +51,41 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public string CreateOrderDocument(Order newOrder)
+        public ProviderResponseWrapperCopy CreateOrderDocument(Order newOrder)
         {
-            OrderDTO newOrderDTO = new OrderDTO
-            {
-                Order_Number = newOrder.Order_Number,
-                Customer_First = newOrder.Customer_First,
-                Customer_Last = newOrder.Customer_Last,
-                SKU = newOrder.SKU,
-                Status = newOrder.Status,
-                Order_Created = DateTime.Now
-            };
-
             try
             {
-                return _ordersRepository.CreateOrderDocument(newOrderDTO);
+                OrderDTO newOrderDTO = new OrderDTO
+                {
+                    Order_Number = newOrder.Order_Number,
+                    Customer_First = newOrder.Customer_First,
+                    Customer_Last = newOrder.Customer_Last,
+                    SKU = newOrder.SKU,
+                    Status = newOrder.Status,
+                    Order_Created = DateTime.Now
+                };
+
+                if (newOrderDTO.IsValid() == true)
+                {
+                    string repositoryMessage = _ordersRepository.CreateOrderDocument(newOrderDTO);
+                    if (repositoryMessage == "New item Inserted")
+                    {
+                        return PRWBuilder(repositoryMessage, 1);
+                    }
+                    return PRWBuilder(repositoryMessage, 3);
+                }
+                else
+                {
+                    return PRWBuilder("Some fields are completed incorrect. Please re-enter values again.", 2);
+                }
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                return ex.Message;
+                return PRWBuilder(ex.ToString(), 2);
+            }
+            catch (Exception ex1)
+            {
+                return PRWBuilder(ex1.ToString(), 3);
             }
         }
 
@@ -96,29 +113,71 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public string BoxOrderCreate(string orderID)
+        public async Task<ProviderResponseWrapperCopy> BoxOrderCreateAsync(string orderID)
         {
+            try
+            {
+                if (orderID != null)
+                {
+                    OrderDTO selectedOrder = _ordersRepository.GetOrder(orderID);
+                    string sku = selectedOrder.SKU;
+                    
+                    HttpClient client = new HttpClient();
+                    string uri = "http://localhost:55001/api/Stock/OrderFulfillmentStock?orderSKU=" + sku;
 
-            OrderDTO selectedOrder = _ordersRepository.GetOrder(orderID);
-            string sku = selectedOrder.SKU;
-
-            HttpClient client = new HttpClient();
-            string uri = "http://localhost:55001/api/Stock/OrderFulfillmentStock?orderSKU=" + sku;
-
-            HttpResponseMessage response = client.GetAsync(uri).Result;
-            string responseMessage = response.Content.ReadAsStringAsync().Result;
-            List<StockCopyDTO> validStock = JsonConvert.DeserializeObject<List<StockCopyDTO>>(responseMessage);
+                    HttpResponseMessage httpResponse = client.GetAsync(uri).Result;
+                    string response = await httpResponse.Content.ReadAsStringAsync();
 
 
-            string json = JsonConvert.SerializeObject(validStock);
-            return json;
+                    JsonResult jsonResponse = new JsonResult(JsonConvert.DeserializeObject(response))
+                    {
+                        StatusCode = (int)httpResponse.StatusCode,
+                        ContentType = httpResponse.Content.Headers.ContentType.ToString()
+                    };
+
+                    // Make into contract, as Jordan
+                    ProviderResponseWrapperCopy boxStock = JsonConvert.DeserializeObject<ProviderResponseWrapperCopy>(jsonResponse.Value.ToString());
+                    return boxStock;
+                }
+                return PRWBuilder("The SKU field is null. Please enter something in the field.", 2);
+            }
+            catch (ArgumentException)
+            {
+                return PRWBuilder("This SKU does not exist. Please try another SKU.", 2);
+            }
+            catch (HttpRequestException)
+            {
+                return PRWBuilder("Failed to contact to Stock API. Please try later.", 3);
+            }
+            catch (NullReferenceException ex)
+            {
+                return PRWBuilder("Not enough stock is eligible to fulfill the order.", 2);
+            }
+            catch (Exception ex)
+            {
+                return PRWBuilder(ex.ToString(), 3);
+            }
         }
- 
-        public string AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate)
+
+
+        public ProviderResponseWrapperCopy AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate)
         {
-            List<StockCopyDTO> orderItems = JsonConvert.DeserializeObject<List<StockCopyDTO>>(jsonBoxOrderCreate);
-            OrderDTO orderObject = JsonConvert.DeserializeObject<OrderDTO>(jsonOrder);
-            return _ordersRepository.AssignOrderItems(orderID, orderItems, orderObject);
+            try
+            {
+                List<StockCopyDTO> orderItems = JsonConvert.DeserializeObject<List<StockCopyDTO>>(jsonBoxOrderCreate);
+                OrderDTO orderObject = JsonConvert.DeserializeObject<OrderDTO>(jsonOrder);
+                string responseRepository = _ordersRepository.AssignOrderItems(orderID, orderItems, orderObject);
+
+                if (responseRepository == "Order record has been updated with allocated items")
+                {
+                    return PRWBuilder(responseRepository, 1);
+                }
+                return PRWBuilder(responseRepository, 3);
+            }
+            catch (Exception ex)
+            {
+                return PRWBuilder(ex.ToString(), 3);
+            }
         }
 
         public string GetOrder(string orderID)
@@ -186,5 +245,16 @@ namespace WooCommerceAPI.BLL
             return new List<string>();
  
     }
-}
+
+        // Build exception messages 
+        public ProviderResponseWrapperCopy PRWBuilder(string json, int responseType)
+        {
+            ProviderResponseWrapperCopy response = new ProviderResponseWrapperCopy
+            {
+                ResponseMessage = json,
+                ResponseType = responseType
+            };
+            return response;
+        }
+    }
 }

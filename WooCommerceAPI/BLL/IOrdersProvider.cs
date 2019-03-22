@@ -1,4 +1,5 @@
 ﻿using OrdersAPI.Models;
+using StockAPI.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,11 +9,11 @@ namespace WooCommerceAPI.BLL
     {
         string GetOrders();
         string GetLateOrders();
-        string CreateOrderDocument(Order newOrder);
+        ProviderResponseWrapperCopy CreateOrderDocument(Order newOrder);
         string RemoveCompletedOrders();
         string ModifyOrderStatus(string orderID, string statusType);
-        string BoxOrderCreate(string orderID);
-        string AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate);
+        Task<ProviderResponseWrapperCopy> BoxOrderCreateAsync(string orderID);
+        ProviderResponseWrapperCopy AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate);
         string GetOrder(string orderID);
         string RemoveOrder(string orderID);
         Task<List<string>> ReallocatedRemovedOrderStock(List<string> reallocatedStock);
