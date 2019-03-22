@@ -45,18 +45,59 @@ namespace WooCommerceAPI.Controllers
                 return ex.Message;
             }
         }
-        
+
+        // GET: ALL ORDER DOCUMENTS
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [HttpGet]
-        [Route("GatherOrders")]
-        public string GetOrders()
+        [Route("GetOrders")]
+        public JsonResult GetOrders()
         {
             try
             {
-                return _ordersProvider.GetOrders();
+               ProviderResponseWrapperCopy providerResponse =  _ordersProvider.GetOrders();
+
+                // If stock was successfully sent back
+                if (providerResponse.ResponseType == 1)
+                {
+                    JsonResult okJsonResult = new JsonResult(providerResponse.ResponseMessage)
+                    {
+                        ContentType = "application/json",
+                        StatusCode = 200
+                    };
+                    return okJsonResult;
+                }
+                // If stock was not found
+                else if (providerResponse.ResponseType == 2)
+                {
+                    JsonResult userInvalidJsonResult = new JsonResult(providerResponse.ResponseMessage)
+
+                    {
+                        ContentType = "application/json",
+                        StatusCode = 400
+                    };
+                    return userInvalidJsonResult;
+                }
+                else
+                {
+                    JsonResult serverInvalidJsonResult = new JsonResult(providerResponse.ResponseMessage)
+
+                    {
+                        ContentType = "application/json",
+                        StatusCode = 500
+                    };
+                    return serverInvalidJsonResult;
+                }
             } 
             catch (Exception ex)
             {
-                return ex.Message; 
+                JsonResult unavaliableJsonResult = new JsonResult(ex.ToString())
+                {
+                    ContentType = "application/json",
+                    StatusCode = 500
+                };
+                return unavaliableJsonResult;
             }
         }
 

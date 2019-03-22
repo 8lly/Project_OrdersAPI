@@ -23,17 +23,28 @@ namespace WooCommerceAPI.BLL
             _ordersRepository = gop;
         }
 
-        public string GetOrders()
+        public ProviderResponseWrapperCopy GetOrders()
         {
             try
             {
-                var allOrders = _ordersRepository.GetOrders();
-                string json = JsonConvert.SerializeObject(allOrders);
-                return json;
+                List<OrderDTO> allOrders = _ordersRepository.GetOrders();
+                if (allOrders.Count > 0)
+                {
+                    string providerRepositoryJson = JsonConvert.SerializeObject(allOrders);
+                    return PRWBuilder(providerRepositoryJson, 1);
+                }
+                else
+                {
+                    return PRWBuilder("No orders have been saved!", 3);
+                }
             }
-            catch (Exception ex)
+            catch (NullReferenceException ex)
             {
-                return ex.Message;
+                return PRWBuilder(ex.ToString(), 2);
+            }
+            catch (Exception ex1)
+            {
+                return PRWBuilder(ex1.ToString(), 3);
             }
         }
 
@@ -158,8 +169,7 @@ namespace WooCommerceAPI.BLL
                 return PRWBuilder(ex.ToString(), 3);
             }
         }
-
-
+        
         public ProviderResponseWrapperCopy AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate)
         {
             try
