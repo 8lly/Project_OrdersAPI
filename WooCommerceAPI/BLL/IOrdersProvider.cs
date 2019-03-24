@@ -8,7 +8,7 @@ namespace WooCommerceAPI.BLL
     public interface IOrdersProvider
     {
         ProviderResponseWrapperCopy GetOrders();
-        string GetLateOrders();
+        ProviderResponseWrapperCopy GetLateOrders();
         ProviderResponseWrapperCopy CreateOrderDocument(Order newOrder);
         string RemoveCompletedOrders();
         string ModifyOrderStatus(string orderID, string statusType);

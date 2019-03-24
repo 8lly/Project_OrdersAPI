@@ -35,12 +35,8 @@ namespace WooCommerceAPI.BLL
                 }
                 else
                 {
-                    return PRWBuilder("No orders have been saved!", 3);
+                    return PRWBuilder("No orders have been saved!", 2);
                 }
-            }
-            catch (NullReferenceException ex)
-            {
-                return PRWBuilder(ex.ToString(), 2);
             }
             catch (Exception ex1)
             {
@@ -48,17 +44,24 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public string GetLateOrders()
+        public ProviderResponseWrapperCopy GetLateOrders()
         {
             try
             {
                 List<OrderDTO> lateOrders = _ordersRepository.GetLateOrders();
-                string json = JsonConvert.SerializeObject(lateOrders);
-                return json;
+                if (lateOrders.Count > 0)
+                {
+                    string repositoryResponseJson = JsonConvert.SerializeObject(lateOrders);
+                    return PRWBuilder(repositoryResponseJson, 1);
+                }
+                else
+                {
+                    return PRWBuilder("No late orders have been saved!", 2);
+                }
             }
-            catch (Exception ex)
+            catch (Exception ex1)
             {
-                return ex.Message;
+                return PRWBuilder(ex1.ToString(), 3);
             }
         }
 

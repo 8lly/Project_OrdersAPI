@@ -1,15 +1,17 @@
-using Moq;
+﻿using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using OrdersAPI.Models;
 using StockAPI.Models;
+using System;
 using System.Collections.Generic;
+using System.Text;
 using WooCommerceAPI.BLL;
 using WooCommerceAPI.DAL;
 
 namespace OrdersAPITests.OrdersProviderTests
 {
-    public class GetOrdersTests
+    class GetLateOrdersTests
     {
         Mock<IOrdersRepository> _mockOrderRepository;
 
@@ -19,15 +21,15 @@ namespace OrdersAPITests.OrdersProviderTests
             _mockOrderRepository = new Mock<IOrdersRepository>();
         }
 
-        // Test: Get one order
+        // Test: Get one late order
         [Test]
-        public void TestGetOrdersReturnsOneOrder()
+        public void TestGetOrdersReturnsOneLateOrder()
         {
             // Act
-            _mockOrderRepository.Setup(x => x.GetOrders()).Returns(CreateOrderDTOList(1));
+            _mockOrderRepository.Setup(x => x.GetLateOrders()).Returns(CreateOrderDTOList(1));
             // Is this meant to be orderprovider or orderscontroller
             OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object);
-            ProviderResponseWrapperCopy outputGetOrdersAsProviderResponseWrapper = orderProvider.GetOrders();
+            ProviderResponseWrapperCopy outputGetOrdersAsProviderResponseWrapper = orderProvider.GetLateOrders();
             List<OrderDTO> outputOrderList = JsonConvert.DeserializeObject<List<OrderDTO>>(outputGetOrdersAsProviderResponseWrapper.ResponseMessage);
 
             // Assert
@@ -35,20 +37,20 @@ namespace OrdersAPITests.OrdersProviderTests
             Assert.AreEqual("Test0", outputOrderList[0].Id);
         }
 
-        // Test: Get one thousand orders
+        // Test: Get one thousand late orders
         [Test]
-        public void TestGetOrdersReturnsOneThousandOrders()
+        public void TestGetOrdersReturnsOneThousandLateOrders()
         {
             // Act
-            _mockOrderRepository.Setup(x => x.GetOrders()).Returns(CreateOrderDTOList(1000));
+            _mockOrderRepository.Setup(x => x.GetLateOrders()).Returns(CreateOrderDTOList(1000));
+            // Is this meant to be orderprovider or orderscontroller
             OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object);
-            ProviderResponseWrapperCopy outputGetOrdersAsProviderResponseWrapper = orderProvider.GetOrders();
+            ProviderResponseWrapperCopy outputGetOrdersAsProviderResponseWrapper = orderProvider.GetLateOrders();
             List<OrderDTO> outputOrderList = JsonConvert.DeserializeObject<List<OrderDTO>>(outputGetOrdersAsProviderResponseWrapper.ResponseMessage);
 
             // Assert
             Assert.AreEqual(1000, outputOrderList.Count);
-            for (int i = 0; i < outputOrderList.Count; i++)
-            {
+            for (int i = 0; i < outputOrderList.Count; i++){
                 Assert.AreEqual("Test" + i.ToString(), outputOrderList[i].Id);
             }
         }
@@ -58,12 +60,12 @@ namespace OrdersAPITests.OrdersProviderTests
         public void TestGetOrdersReturnsNullOrders()
         {
             // Act
-            _mockOrderRepository.Setup(x => x.GetOrders()).Returns(CreateOrderDTOList(0));
+            _mockOrderRepository.Setup(x => x.GetLateOrders()).Returns(CreateOrderDTOList(0));
             OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object);
-            ProviderResponseWrapperCopy outputGetOrdersAsProviderResponseWrapper = orderProvider.GetOrders();
+            ProviderResponseWrapperCopy outputGetOrdersAsProviderResponseWrapper = orderProvider.GetLateOrders();
 
             // Assert
-            Assert.AreEqual("No orders have been saved!", outputGetOrdersAsProviderResponseWrapper.ResponseMessage);
+            Assert.AreEqual("No late orders have been saved!", outputGetOrdersAsProviderResponseWrapper.ResponseMessage);
         }
 
         private List<OrderDTO> CreateOrderDTOList(int numOfOrder)
@@ -73,11 +75,13 @@ namespace OrdersAPITests.OrdersProviderTests
             {
                 OrderDTO order = new OrderDTO
                 {
-                    Id = "Test" + i.ToString()
+                    Id = "Test" + i.ToString(),
+                    Order_Created = DateTime.Now
                 };
-            list.Add(order);
+                list.Add(order);
             }
             return list;
         }
+
     }
 }
