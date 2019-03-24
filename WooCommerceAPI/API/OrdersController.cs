@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using OrdersAPI.Helpers;
 using OrdersAPI.Models;
 using StockAPI.Models;
 using WooCommerceAPI.BLL;
@@ -18,8 +19,10 @@ namespace WooCommerceAPI.Controllers
     public class WooController : Controller
     {
         private readonly IOrdersProvider _ordersProvider;
+        // How do I initialise this class
+        APIJsonResultResponseHelper apiJsonResponse = new APIJsonResultResponseHelper();
 
-        // Create instance of Gather Orders Provider
+        // Create instance of Provider
         public WooController(IOrdersProvider op)
         {
             _ordersProvider = op;
@@ -92,7 +95,7 @@ namespace WooCommerceAPI.Controllers
 
         // GET: ALL ORDER DOCUMENTS
         [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         [HttpGet]
         [Route("GetOrders")]
@@ -100,48 +103,17 @@ namespace WooCommerceAPI.Controllers
         {
             try
             {
-               ProviderResponseWrapperCopy providerResponse =  _ordersProvider.GetOrders();
-
-                // If orders was successfully sent back
-                if (providerResponse.ResponseType == 1)
-                {
-                    JsonResult okJsonResult = new JsonResult(providerResponse.ResponseMessage)
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 200
-                    };
-                    return okJsonResult;
-                }
-                // If orders was not found
-                else if (providerResponse.ResponseType == 2)
-                {
-                    JsonResult userInvalidJsonResult = new JsonResult(providerResponse.ResponseMessage)
-
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 400
-                    };
-                    return userInvalidJsonResult;
-                }
-                else
-                {
-                    JsonResult serverInvalidJsonResult = new JsonResult(providerResponse.ResponseMessage)
-
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 500
-                    };
-                    return serverInvalidJsonResult;
-                }
+                ProviderResponseWrapperCopy providerResponse = _ordersProvider.GetOrders();
+                return apiJsonResponse.CreateJsonResultResponse(providerResponse);
             } 
             catch (Exception ex)
             {
-                JsonResult unavaliableJsonResult = new JsonResult(ex.ToString())
+                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
                 {
-                    ContentType = "application/json",
-                    StatusCode = 500
+                    ResponseMessage = ex.ToString(),
+                    ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
                 };
-                return unavaliableJsonResult;
+                return apiJsonResponse.CreateJsonResultResponse(apiUnavaliableResponse);
             }
         }
 
@@ -156,47 +128,16 @@ namespace WooCommerceAPI.Controllers
             try
             {
                 ProviderResponseWrapperCopy providerResponse = _ordersProvider.GetOrder(orderID);
-
-                // If order was successfully retrived
-                if (providerResponse.ResponseType == 1)
-                {
-                    JsonResult okJsonResult = new JsonResult(providerResponse.ResponseMessage)
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 200
-                    };
-                    return okJsonResult;
-                }
-                // If order was not found 
-                if (providerResponse.ResponseType == 2)
-                {
-                    JsonResult userInvalidJsonResult = new JsonResult(providerResponse.ResponseMessage)
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 200
-                    };
-                    return userInvalidJsonResult;
-                }
-                else
-                {
-                    JsonResult serverInvalidJsonResult = new JsonResult(providerResponse.ResponseMessage)
-
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 500
-                    };
-                    return serverInvalidJsonResult;
-                }
+                return apiJsonResponse.CreateJsonResultResponse(providerResponse);
             }
             catch (Exception ex)
             {
-                JsonResult apiInvalidJsonResult = new JsonResult(ex.ToString())
-
+                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
                 {
-                    ContentType = "application/json",
-                    StatusCode = 500
+                    ResponseMessage = ex.ToString(),
+                    ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
                 };
-                return apiInvalidJsonResult;
+                return apiJsonResponse.CreateJsonResultResponse(apiUnavaliableResponse);
             }
         }
 
@@ -210,43 +151,16 @@ namespace WooCommerceAPI.Controllers
             try
             {
                 ProviderResponseWrapperCopy providerResponse = _ordersProvider.CreateOrderDocument(newOrder);
-                
-                if (providerResponse.ResponseType == 1)
-                {
-                    JsonResult okJsonResult = new JsonResult(providerResponse.ResponseMessage)
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 200
-                    };
-                    return okJsonResult;
-                }
-                else if (providerResponse.ResponseType == 2)
-                {
-                    JsonResult userErrorJsonResult = new JsonResult(providerResponse.ResponseMessage)
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 400
-                    };
-                    return userErrorJsonResult;
-                }
-                else
-                {
-                    JsonResult serverErrorJsonResult = new JsonResult(providerResponse.ResponseMessage)
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 500
-                    };
-                    return serverErrorJsonResult;
-                }
+                return apiJsonResponse.CreateJsonResultResponse(providerResponse);         
             }
             catch (Exception ex)
             {
-                JsonResult apiErrorJsonResult = new JsonResult(ex.ToString())
+                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
                 {
-                    ContentType = "application/json",
-                    StatusCode = 500
+                    ResponseMessage = ex.ToString(),
+                    ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
                 };
-                return apiErrorJsonResult;
+                return apiJsonResponse.CreateJsonResultResponse(apiUnavaliableResponse);
             }
         }
 
@@ -265,77 +179,49 @@ namespace WooCommerceAPI.Controllers
                 ProviderResponseWrapperCopy response = await _ordersProvider.BoxOrderCreateAsync(orderID);
                 string jsonBoxOrderCreate = response.ResponseMessage;
 
-                if (response.ResponseType == 1)
+                // Okay response from BoxOrderCreateAsync 
+                if ((int)response.ResponseHTMLType == 200)
                 {
                     // Save items to the order document 
-                    ProviderResponseWrapperCopy providerResponseAsProviderResponseWrapperCopy = _ordersProvider.AssignOrderItems(orderID, jsonOrder.ResponseMessage, jsonBoxOrderCreate);
-
-                    // If stock is successfully added to order 
-                    if (providerResponseAsProviderResponseWrapperCopy.ResponseType == 1)
-                    {
-                        JsonResult okJsonResult = new JsonResult(response.ResponseMessage)
-                        {
-                            ContentType = "application/json",
-                            StatusCode = 200
-                        };
-                        return okJsonResult;
-                    }
-                    // Error occured within API
-                    else if (providerResponseAsProviderResponseWrapperCopy.ResponseType == 3)
-                    {
-                        JsonResult userInvalidJsonResult = new JsonResult(response.ResponseMessage)
-                        {
-                            ContentType = "application/json",
-                            StatusCode = 500
-                        };
-                        return userInvalidJsonResult;
-                    }
+                    ProviderResponseWrapperCopy providerResponseAsProviderResponseWrapper = _ordersProvider.AssignOrderItems(orderID, jsonOrder.ResponseMessage, jsonBoxOrderCreate);
+                    return apiJsonResponse.CreateJsonResultResponse(providerResponseAsProviderResponseWrapper);
                 }
-                // If orderfullfillmentstock returns client error
-                else if (response.ResponseType == 2)
+                // Error Response
+                else
                 {
-                    JsonResult clientErrorJsonResult = new JsonResult(response.ResponseMessage)
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 300
-                    };
-                    return clientErrorJsonResult;
+                    return apiJsonResponse.CreateJsonResultResponse(response);
                 }
-                // If orderfullfillmentstock returns server error
-                else if (response.ResponseType == 3)
-                {
-                    JsonResult serverErrorJsonResult = new JsonResult(response.ResponseMessage)
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 500
-                    };
-                    return serverErrorJsonResult;
-                }
-                throw new Exception();
             }
             // API error
             catch (Exception ex)
             {
-                JsonResult apiErrorJsonResult = new JsonResult(ex.ToString())
+                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
                 {
-                    ContentType = "application/json",
-                    StatusCode = 500
+                    ResponseMessage = ex.ToString(),
+                    ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
                 };
-                return apiErrorJsonResult;
+                return apiJsonResponse.CreateJsonResultResponse(apiUnavaliableResponse);
             }
         }
 
+        // TODO
         [HttpPut]
         [Route("ModifyOrder")]
-        public string ModifyOrderStatus(string orderID, string statusType)
+        public JsonResult ModifyOrderStatus(string orderID, string statusType)
         {
             try
             {
-                return _ordersProvider.ModifyOrderStatus(orderID, statusType);
+                ProviderResponseWrapperCopy providerResponse = _ordersProvider.ModifyOrderStatus(orderID, statusType);
+                return apiJsonResponse.CreateJsonResultResponse(providerResponse);      
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
+                {
+                    ResponseMessage = ex.ToString(),
+                    ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
+                };
+                return apiJsonResponse.CreateJsonResultResponse(apiUnavaliableResponse);
             }
         }
 
@@ -348,34 +234,16 @@ namespace WooCommerceAPI.Controllers
             try
             {
                 ProviderResponseWrapperCopy providerResponse =  _ordersProvider.RemoveCompletedOrders();
-
-                if (providerResponse.ResponseType == 1)
-                {
-                    JsonResult okJsonResult = new JsonResult(providerResponse.ResponseMessage)
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 200
-                    };
-                    return okJsonResult;
-                }
-                else
-                {
-                    JsonResult userErrorJsonResult = new JsonResult(providerResponse.ResponseMessage)
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 500
-                    };
-                    return userErrorJsonResult;
-                }
+                return apiJsonResponse.CreateJsonResultResponse(providerResponse);                
             }
             catch (Exception ex)
             {
-                JsonResult apiErrorJsonResult = new JsonResult(ex.ToString())
+                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
                 {
-                    ContentType = "application/json",
-                    StatusCode = 500
+                    ResponseMessage = ex.ToString(),
+                    ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
                 };
-                return apiErrorJsonResult;
+                return apiJsonResponse.CreateJsonResultResponse(apiUnavaliableResponse);
             }
         }
 
@@ -386,22 +254,17 @@ namespace WooCommerceAPI.Controllers
             try
             {
                 ProviderResponseWrapperCopy providerResponse = await _ordersProvider.RemoveOrder(orderID);
-                JsonResult okJsonResult = new JsonResult(providerResponse.ResponseMessage)
-                {
-                    ContentType = "application/json",
-                    StatusCode = 200
-                };
-                return okJsonResult;
+                return apiJsonResponse.CreateJsonResultResponse(providerResponse);
             }
             catch (Exception ex)
             {
-                JsonResult badJsonResult = new JsonResult(ex.ToString())
+                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
                 {
-                    ContentType = "application/json",
-                    StatusCode = 500
+                    ResponseMessage = ex.ToString(),
+                    ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
                 };
-                return badJsonResult;
+                return apiJsonResponse.CreateJsonResultResponse(apiUnavaliableResponse);
             }
-        }        
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using OrdersAPI.Helpers;
 using OrdersAPI.Models;
 using StockAPI.Models;
 using System;
@@ -15,9 +16,9 @@ namespace WooCommerceAPI.BLL
 {
     public class OrdersProvider : IOrdersProvider
     {
-
         // Repository obj
         private readonly IOrdersRepository _ordersRepository;
+        PRWBuilderHelper prwBuilderHelper = new PRWBuilderHelper();
 
         public OrdersProvider(IOrdersRepository gop)
         {
@@ -31,17 +32,17 @@ namespace WooCommerceAPI.BLL
                 List<OrderDTO> allOrders = _ordersRepository.GetOrders();
                 if (allOrders.Count > 0)
                 {
-                    string providerRepositoryJson = JsonConvert.SerializeObject(allOrders);
-                    return PRWBuilder(providerRepositoryJson, 1);
+                    string repositoryResponseJson = JsonConvert.SerializeObject(allOrders);
+                    return prwBuilderHelper.PRWBuilder(repositoryResponseJson, HTTPResponseCodes.HTTP_OK_RESPONSE);
                 }
                 else
                 {
-                    return PRWBuilder("No orders have been saved!", 2);
+                    return prwBuilderHelper.PRWBuilder("No orders have been saved!", HTTPResponseCodes.HTTP_NOT_FOUND);
                 }
             }
             catch (Exception ex1)
             {
-                return PRWBuilder(ex1.ToString(), 3);
+                return prwBuilderHelper.PRWBuilder(ex1.ToString(), HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
         }
 
@@ -53,16 +54,16 @@ namespace WooCommerceAPI.BLL
                 if (lateOrders.Count > 0)
                 {
                     string repositoryResponseJson = JsonConvert.SerializeObject(lateOrders);
-                    return PRWBuilder(repositoryResponseJson, 1);
+                    return prwBuilderHelper.PRWBuilder(repositoryResponseJson, HTTPResponseCodes.HTTP_OK_RESPONSE);
                 }
                 else
                 {
-                    return PRWBuilder("No late orders have been saved!", 2);
+                    return prwBuilderHelper.PRWBuilder("No orders have been saved!", HTTPResponseCodes.HTTP_NOT_FOUND);
                 }
             }
             catch (Exception ex1)
             {
-                return PRWBuilder(ex1.ToString(), 3);
+                return prwBuilderHelper.PRWBuilder(ex1.ToString(), HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
         }
 
@@ -85,22 +86,22 @@ namespace WooCommerceAPI.BLL
                     string repositoryMessage = _ordersRepository.CreateOrderDocument(newOrderDTO);
                     if (repositoryMessage == "New item Inserted")
                     {
-                        return PRWBuilder(repositoryMessage, 1);
+                        return prwBuilderHelper.PRWBuilder(repositoryMessage, HTTPResponseCodes.HTTP_OK_RESPONSE);
                     }
-                    return PRWBuilder(repositoryMessage, 3);
+                    return prwBuilderHelper.PRWBuilder(repositoryMessage, HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
                 }
                 else
                 {
-                    return PRWBuilder("Some fields are completed incorrect. Please re-enter values again.", 2);
+                    return prwBuilderHelper.PRWBuilder("Some fields are completed incorrect. Please re-enter values again.", HTTPResponseCodes.HTTP_BAD_REQUEST);
                 }
             }
             catch (ArgumentNullException ex)
             {
-                return PRWBuilder(ex.ToString(), 2);
+                return prwBuilderHelper.PRWBuilder(ex.ToString(), HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
             catch (Exception ex1)
             {
-                return PRWBuilder(ex1.ToString(), 3);
+                return prwBuilderHelper.PRWBuilder(ex1.ToString(), HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
         }
 
@@ -111,28 +112,36 @@ namespace WooCommerceAPI.BLL
                 string repositoryResponse = _ordersRepository.RemoveCompletedOrders();
                 if (repositoryResponse == "Completed Orders Cleared")
                 {
-                    return PRWBuilder(repositoryResponse, 1);
+                    return prwBuilderHelper.PRWBuilder(repositoryResponse, HTTPResponseCodes.HTTP_OK_RESPONSE);
                 }
                 else
                 {
-                    return PRWBuilder("Database failure. Please try again sure.", 2);
+                    return prwBuilderHelper.PRWBuilder("Database failure. Please try again sure.", HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
                 }
             } 
             catch (Exception ex)
             {
-                return PRWBuilder(ex.ToString(), 2);
+                return prwBuilderHelper.PRWBuilder(ex.ToString(), HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
         }
 
-        public string ModifyOrderStatus(string orderID, string statusType)
+        public ProviderResponseWrapperCopy ModifyOrderStatus(string orderID, string statusType)
         {
             try
             {
-                return _ordersRepository.ModifyOrderStatus(orderID, statusType);
+                string repositoryResponse = _ordersRepository.ModifyOrderStatus(orderID, statusType);
+                if (repositoryResponse == "Stock status has been adjusted.")
+                {
+                    return prwBuilderHelper.PRWBuilder(repositoryResponse, HTTPResponseCodes.HTTP_OK_RESPONSE);
+                }
+                else
+                {
+                    return prwBuilderHelper.PRWBuilder("Database failure. Please try again sure.", HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
+                }
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return prwBuilderHelper.PRWBuilder(ex.ToString(), HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
         }
 
@@ -156,25 +165,25 @@ namespace WooCommerceAPI.BLL
 
                     // Deserialize http response string into return format
                     string boxStock = JsonConvert.DeserializeObject<string>(response);
-                    return PRWBuilder(boxStock, 1);
+                    return prwBuilderHelper.PRWBuilder(boxStock, HTTPResponseCodes.HTTP_OK_RESPONSE);
                 }
-                return PRWBuilder("The SKU field is null. Please enter something in the field.", 2);
+                return prwBuilderHelper.PRWBuilder("The SKU field is null. Please enter something in the field.", HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
             catch (ArgumentException)
             {
-                return PRWBuilder("This SKU does not exist. Please try another SKU.", 2);
+                return prwBuilderHelper.PRWBuilder("This SKU does not exist. Please try another SKU.", HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
             catch (HttpRequestException)
             {
-                return PRWBuilder("Failed to contact to Stock API. Please try later.", 3);
+                return prwBuilderHelper.PRWBuilder("Failed to contact to Stock API. Please try later.", HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
             catch (NullReferenceException ex)
             {
-                return PRWBuilder("Not enough stock is eligible to fulfill the order.", 2);
+                return prwBuilderHelper.PRWBuilder("Not enough stock is eligible to fulfill the order.", HTTPResponseCodes.HTTP_NOT_FOUND);
             }
             catch (Exception ex)
             {
-                return PRWBuilder(ex.ToString(), 3);
+                return prwBuilderHelper.PRWBuilder(ex.ToString(), HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
         }
         
@@ -188,13 +197,13 @@ namespace WooCommerceAPI.BLL
 
                 if (responseRepository == "Order record has been updated with allocated items")
                 {
-                    return PRWBuilder(responseRepository, 1);
+                    return prwBuilderHelper.PRWBuilder(responseRepository, HTTPResponseCodes.HTTP_OK_RESPONSE);
                 }
-                return PRWBuilder(responseRepository, 3);
+                return prwBuilderHelper.PRWBuilder(responseRepository, HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
             catch (Exception ex)
             {
-                return PRWBuilder(ex.ToString(), 3);
+                return prwBuilderHelper.PRWBuilder(ex.ToString(), HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
         }
 
@@ -206,17 +215,17 @@ namespace WooCommerceAPI.BLL
                 if (order != null)
                 {
                     string json = JsonConvert.SerializeObject(order);
-                    return PRWBuilder(json, 1);
+                    return prwBuilderHelper.PRWBuilder(json, HTTPResponseCodes.HTTP_OK_RESPONSE);
                 }
-                return PRWBuilder("No record found with given Order ID", 2);
+                return prwBuilderHelper.PRWBuilder("No record found with given Order ID", HTTPResponseCodes.HTTP_NOT_FOUND);
             }
             catch (ArgumentNullException ex)
             {
-                return PRWBuilder("No Order ID was given, please enter an Order ID", 2);
+                return prwBuilderHelper.PRWBuilder("No Order ID was given, please enter an Order ID", HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
             catch (Exception ex1)
             {
-                return PRWBuilder(ex1.Message, 3);
+                return prwBuilderHelper.PRWBuilder(ex1.Message, HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
         }
 
@@ -249,45 +258,39 @@ namespace WooCommerceAPI.BLL
                     {
                         await ReallocatedRemovedOrderStock(allocatedItems);
                     }
-                    return PRWBuilder("Record has been successfully removed", 1);
+                    return prwBuilderHelper.PRWBuilder("Record has been successfully removed", HTTPResponseCodes.HTTP_OK_RESPONSE);
                 }
                 // Order ID does not exist, or is incorrect 
-                return PRWBuilder("No record matches given Order ID", 2);
+                return prwBuilderHelper.PRWBuilder("No record matches given Order ID", HTTPResponseCodes.HTTP_NOT_FOUND);
             }
             // Back-end failures 
             catch (Exception ex)
             {
-                return PRWBuilder(ex.ToString(), 3);
+                return prwBuilderHelper.PRWBuilder(ex.ToString(), HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
         }
 
-        public async Task <List<string>> ReallocatedRemovedOrderStock(List<string> reallocatedStockList)
+        public async Task<ProviderResponseWrapperCopy> ReallocatedRemovedOrderStock(List<string> reallocatedStockList)
         {
-
-            HttpClient client = new HttpClient();
-            string requestURI = "http://localhost:55001/api/Stock/UpdateStockAddAllocation";
-
-            for (int x = 0; x < reallocatedStockList.Count; x++)
+            try
             {
-                // How to get rid of this?
-                var content = new StringContent("");
+                HttpClient client = new HttpClient();
+                string requestURI = "http://localhost:55001/api/Stock/UpdateStockAddAllocation";
 
-                HttpResponseMessage response = await client.PostAsync($"{requestURI}/?body={reallocatedStockList[x]}", content);
+                for (int x = 0; x < reallocatedStockList.Count; x++)
+                {
+                    // How to get rid of this?
+                    var content = new StringContent("");
+                    HttpResponseMessage response = await client.PostAsync($"{requestURI}/?body={reallocatedStockList[x]}", content);
+                }
+
+                return prwBuilderHelper.PRWBuilder("Order Successfully Removed", HTTPResponseCodes.HTTP_OK_RESPONSE);
             }
-
-            return new List<string>(); 
+            catch (Exception ex)
+            {
+                return prwBuilderHelper.PRWBuilder(ex.ToString(), HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
+            }
     }
-
-        // Build exception messages 
-        public ProviderResponseWrapperCopy PRWBuilder(string json, int responseType)
-        {
-            ProviderResponseWrapperCopy response = new ProviderResponseWrapperCopy
-            {
-                ResponseMessage = json,
-                ResponseType = responseType
-            };
-            return response;
-        }
 
         // Assist method to determine if order contained items 
         public bool DoesOrderContainItems(string sku, List<string> items)

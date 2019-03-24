@@ -11,12 +11,12 @@ namespace WooCommerceAPI.BLL
         ProviderResponseWrapperCopy GetLateOrders();
         ProviderResponseWrapperCopy CreateOrderDocument(Order newOrder);
         ProviderResponseWrapperCopy RemoveCompletedOrders();
-        string ModifyOrderStatus(string orderID, string statusType);
+        ProviderResponseWrapperCopy ModifyOrderStatus(string orderID, string statusType);
         Task<ProviderResponseWrapperCopy> BoxOrderCreateAsync(string orderID);
         ProviderResponseWrapperCopy AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate);
         ProviderResponseWrapperCopy GetOrder(string orderID);
         Task<ProviderResponseWrapperCopy> RemoveOrder(string orderID);
-        Task<List<string>> ReallocatedRemovedOrderStock(List<string> reallocatedStock);
+        Task<ProviderResponseWrapperCopy> ReallocatedRemovedOrderStock(List<string> reallocatedStock);
         bool DoesOrderContainItems(string sku, List<string> items);
     }
 }
