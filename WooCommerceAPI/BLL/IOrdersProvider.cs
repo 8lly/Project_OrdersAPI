@@ -10,7 +10,7 @@ namespace WooCommerceAPI.BLL
         ProviderResponseWrapperCopy GetOrders();
         ProviderResponseWrapperCopy GetLateOrders();
         ProviderResponseWrapperCopy CreateOrderDocument(Order newOrder);
-        string RemoveCompletedOrders();
+        ProviderResponseWrapperCopy RemoveCompletedOrders();
         string ModifyOrderStatus(string orderID, string statusType);
         Task<ProviderResponseWrapperCopy> BoxOrderCreateAsync(string orderID);
         ProviderResponseWrapperCopy AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate);

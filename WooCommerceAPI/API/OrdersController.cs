@@ -341,15 +341,39 @@ namespace WooCommerceAPI.Controllers
 
         [HttpDelete]
         [Route("RemoveCompletedOrders")]
-        public string RemoveCompletedOrders()
+        public JsonResult RemoveCompletedOrders()
         {
             try
             {
-                return _ordersProvider.RemoveCompletedOrders();
+                ProviderResponseWrapperCopy providerResponse =  _ordersProvider.RemoveCompletedOrders();
+
+                if (providerResponse.ResponseType == 1)
+                {
+                    JsonResult okJsonResult = new JsonResult(providerResponse.ResponseMessage)
+                    {
+                        ContentType = "application/json",
+                        StatusCode = 200
+                    };
+                    return okJsonResult;
+                }
+                else
+                {
+                    JsonResult userErrorJsonResult = new JsonResult(providerResponse.ResponseMessage)
+                    {
+                        ContentType = "application/json",
+                        StatusCode = 500
+                    };
+                    return userErrorJsonResult;
+                }
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                JsonResult apiErrorJsonResult = new JsonResult(ex.ToString())
+                {
+                    ContentType = "application/json",
+                    StatusCode = 500
+                };
+                return apiErrorJsonResult;
             }
         }
 

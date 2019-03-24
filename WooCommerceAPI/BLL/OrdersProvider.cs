@@ -103,15 +103,23 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public string RemoveCompletedOrders()
+        public ProviderResponseWrapperCopy RemoveCompletedOrders()
         {
             try
             {
-                return _ordersRepository.RemoveCompletedOrders();
-            }
+                string repositoryResponse = _ordersRepository.RemoveCompletedOrders();
+                if (repositoryResponse == "Completed Orders Cleared")
+                {
+                    return PRWBuilder(repositoryResponse, 1);
+                }
+                else
+                {
+                    return PRWBuilder("Database failure. Please try again sure.", 2);
+                }
+            } 
             catch (Exception ex)
             {
-                return ex.Message;
+                return PRWBuilder(ex.ToString(), 2);
             }
         }
 
@@ -136,20 +144,15 @@ namespace WooCommerceAPI.BLL
                     OrderDTO selectedOrder = _ordersRepository.GetOrder(orderID);
                     string sku = selectedOrder.SKU;
                     
+                    // Send request to OrderFullfillmentStock EndPoint in Stock API
                     HttpClient client = new HttpClient();
                     string uri = "http://localhost:55001/api/Stock/OrderFulfillmentStock?orderSKU=" + sku;
 
+                    // Returned Message
                     HttpResponseMessage httpResponse = client.GetAsync(uri).Result;
+                    // Read stock in message into var
                     string response = await httpResponse.Content.ReadAsStringAsync();
 
-                    /* 
-                    JsonResult jsonResponse = new JsonResult(JsonConvert.DeserializeObject(response))
-                    {
-                        StatusCode = (int)httpResponse.StatusCode,
-                        ContentType = httpResponse.Content.Headers.ContentType.ToString()
-                    };
-                    */
-                    
                     // Deserialize http response string into return format
                     string boxStock = JsonConvert.DeserializeObject<string>(response);
                     return PRWBuilder(boxStock, 1);
