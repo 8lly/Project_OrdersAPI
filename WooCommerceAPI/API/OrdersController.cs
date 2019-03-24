@@ -339,6 +339,8 @@ namespace WooCommerceAPI.Controllers
             }
         }
 
+        [ProducesResponseType(200)]
+        [ProducesResponseType(500)]
         [HttpDelete]
         [Route("RemoveCompletedOrders")]
         public JsonResult RemoveCompletedOrders()
@@ -379,16 +381,26 @@ namespace WooCommerceAPI.Controllers
 
         [HttpDelete]
         [Route("RemoveOrder")]
-        public string RemoveOrder(string orderID)
+        public async Task<JsonResult> RemoveOrder(string orderID)
         {
             try
             {
-                string reallocatedStock = _ordersProvider.RemoveOrder(orderID);
-                return "";
+                ProviderResponseWrapperCopy providerResponse = await _ordersProvider.RemoveOrder(orderID);
+                JsonResult okJsonResult = new JsonResult(providerResponse.ResponseMessage)
+                {
+                    ContentType = "application/json",
+                    StatusCode = 200
+                };
+                return okJsonResult;
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                JsonResult badJsonResult = new JsonResult(ex.ToString())
+                {
+                    ContentType = "application/json",
+                    StatusCode = 500
+                };
+                return badJsonResult;
             }
         }        
     }

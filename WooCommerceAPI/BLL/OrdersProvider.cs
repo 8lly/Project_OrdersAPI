@@ -5,6 +5,7 @@ using StockAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -219,37 +220,44 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public string RemoveOrder(string orderID)
+        public async Task<ProviderResponseWrapperCopy> RemoveOrder(string orderID)
         {
             try
             {
                 // Delete record, save copy to return freed stock
                 OrderDTO removedOrder = _ordersRepository.RemoveOrder(orderID);
-                // Stock items returning to stock db
-                List<string> allocatedItems = new List<string>()
+                if (removedOrder != null)
                 {
-                    removedOrder.ItemOneName,
-                    removedOrder.ItemTwoName,
-                    removedOrder.ItemThreeName,
-                    removedOrder.ItemFourName,
-                    removedOrder.ItemFiveName,
-                    removedOrder.ItemSixName,
-                    removedOrder.ItemSevenName,
-                    removedOrder.ItemEightName,
-                };
+                    // Stock items returning to stock db
+                    List<string> allocatedItems = new List<string>()
+                    {
+                        removedOrder.ItemOneName,
+                        removedOrder.ItemTwoName,
+                        removedOrder.ItemThreeName,
+                        removedOrder.ItemFourName,
+                        removedOrder.ItemFiveName,
+                        removedOrder.ItemSixName,
+                        removedOrder.ItemSevenName,
+                        removedOrder.ItemEightName,
+                    };
 
-                // Remove nulls from list 
-                // allocatedItems.RemoveAll(string.IsNullOrWhiteSpace);
+                    // Remove nulls from list 
+                    // allocatedItems.RemoveAll(string.IsNullOrWhiteSpace);
 
-                ReallocatedRemovedOrderStock(allocatedItems);
-
-                string json = JsonConvert.SerializeObject(allocatedItems);
-                return json;
-
+                    // Only run this method if the removed order contained items
+                    if (DoesOrderContainItems(removedOrder.SKU, allocatedItems) == true)
+                    {
+                        await ReallocatedRemovedOrderStock(allocatedItems);
+                    }
+                    return PRWBuilder("Record has been successfully removed", 1);
+                }
+                // Order ID does not exist, or is incorrect 
+                return PRWBuilder("No record matches given Order ID", 2);
             }
+            // Back-end failures 
             catch (Exception ex)
             {
-                return ex.Message;
+                return PRWBuilder(ex.ToString(), 3);
             }
         }
 
@@ -267,8 +275,7 @@ namespace WooCommerceAPI.BLL
                 HttpResponseMessage response = await client.PostAsync($"{requestURI}/?body={reallocatedStockList[x]}", content);
             }
 
-            return new List<string>();
- 
+            return new List<string>(); 
     }
 
         // Build exception messages 
@@ -280,6 +287,40 @@ namespace WooCommerceAPI.BLL
                 ResponseType = responseType
             };
             return response;
+        }
+
+        // Assist method to determine if order contained items 
+        public bool DoesOrderContainItems(string sku, List<string> items)
+        {
+            // If SKU has 6 items assosiated
+            if ((sku == "SKU000001") || (sku == "SKU000002") || (sku == "SKU000004"))
+            {
+                items.RemoveRange(items.Count - 2, 2);
+                if (items.Any(o => o != null))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            // If SKU has 7 items assosiated
+            /**
+             * .....
+             */
+            // If SKU has 8 items assosiated
+            else
+            {
+                if (items.Any(x => x != null))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }        
         }
     }
 }

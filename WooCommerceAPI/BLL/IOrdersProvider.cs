@@ -15,7 +15,8 @@ namespace WooCommerceAPI.BLL
         Task<ProviderResponseWrapperCopy> BoxOrderCreateAsync(string orderID);
         ProviderResponseWrapperCopy AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate);
         ProviderResponseWrapperCopy GetOrder(string orderID);
-        string RemoveOrder(string orderID);
+        Task<ProviderResponseWrapperCopy> RemoveOrder(string orderID);
         Task<List<string>> ReallocatedRemovedOrderStock(List<string> reallocatedStock);
+        bool DoesOrderContainItems(string sku, List<string> items);
     }
 }
