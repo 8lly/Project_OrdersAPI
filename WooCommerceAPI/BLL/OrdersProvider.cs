@@ -142,16 +142,17 @@ namespace WooCommerceAPI.BLL
                     HttpResponseMessage httpResponse = client.GetAsync(uri).Result;
                     string response = await httpResponse.Content.ReadAsStringAsync();
 
-
+                    /* 
                     JsonResult jsonResponse = new JsonResult(JsonConvert.DeserializeObject(response))
                     {
                         StatusCode = (int)httpResponse.StatusCode,
                         ContentType = httpResponse.Content.Headers.ContentType.ToString()
                     };
-
-                    // Make into contract, as Jordan
-                    ProviderResponseWrapperCopy boxStock = JsonConvert.DeserializeObject<ProviderResponseWrapperCopy>(jsonResponse.Value.ToString());
-                    return boxStock;
+                    */
+                    
+                    // Deserialize http response string into return format
+                    string boxStock = JsonConvert.DeserializeObject<string>(response);
+                    return PRWBuilder(boxStock, 1);
                 }
                 return PRWBuilder("The SKU field is null. Please enter something in the field.", 2);
             }
@@ -193,17 +194,25 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public string GetOrder(string orderID)
+        public ProviderResponseWrapperCopy GetOrder(string orderID)
         {
             try
             {
-                var order = _ordersRepository.GetOrder(orderID);
-                string json = JsonConvert.SerializeObject(order);
-                return json;
+                OrderDTO order = _ordersRepository.GetOrder(orderID);
+                if (order != null)
+                {
+                    string json = JsonConvert.SerializeObject(order);
+                    return PRWBuilder(json, 1);
+                }
+                return PRWBuilder("No record found with given Order ID", 2);
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                return ex.Message;
+                return PRWBuilder("No Order ID was given, please enter an Order ID", 2);
+            }
+            catch (Exception ex1)
+            {
+                return PRWBuilder(ex1.Message, 3);
             }
         }
 

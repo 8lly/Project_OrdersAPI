@@ -14,7 +14,7 @@ namespace WooCommerceAPI.BLL
         string ModifyOrderStatus(string orderID, string statusType);
         Task<ProviderResponseWrapperCopy> BoxOrderCreateAsync(string orderID);
         ProviderResponseWrapperCopy AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate);
-        string GetOrder(string orderID);
+        ProviderResponseWrapperCopy GetOrder(string orderID);
         string RemoveOrder(string orderID);
         Task<List<string>> ReallocatedRemovedOrderStock(List<string> reallocatedStock);
     }
