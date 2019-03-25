@@ -47,49 +47,17 @@ namespace WooCommerceAPI.Controllers
             try
             {
                 ProviderResponseWrapperCopy providerResponse = _ordersProvider.GetLateOrders();
-
-                // If late orders was successfully sent back
-                if (providerResponse.ResponseType == 1)
-                {
-                    JsonResult okJsonResult = new JsonResult(providerResponse.ResponseMessage)
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 200
-                    };
-                    return okJsonResult;
-                }
-                // If late orders was not found
-                else if (providerResponse.ResponseType == 2)
-                {
-                    JsonResult userInvalidJsonResult = new JsonResult(providerResponse.ResponseMessage)
-
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 400
-                    };
-                    return userInvalidJsonResult;
-                }
-                // If error with back-end
-                else
-                {
-                    JsonResult serverInvalidJsonResult = new JsonResult(providerResponse.ResponseMessage)
-
-                    {
-                        ContentType = "application/json",
-                        StatusCode = 500
-                    };
-                    return serverInvalidJsonResult;
-                }
+                return apiJsonResponse.CreateJsonResultResponse(providerResponse);
             }
             // If error with upper API level
             catch (Exception ex)
             {
-                JsonResult unavaliableJsonResult = new JsonResult(ex.ToString())
+                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
                 {
-                    ContentType = "application/json",
-                    StatusCode = 500
+                    ResponseMessage = ex.ToString(),
+                    ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
                 };
-                return unavaliableJsonResult;
+                return apiJsonResponse.CreateJsonResultResponse(apiUnavaliableResponse);
             }
         }
 

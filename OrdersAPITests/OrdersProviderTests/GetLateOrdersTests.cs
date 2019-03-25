@@ -65,7 +65,7 @@ namespace OrdersAPITests.OrdersProviderTests
             ProviderResponseWrapperCopy outputGetOrdersAsProviderResponseWrapper = orderProvider.GetLateOrders();
 
             // Assert
-            Assert.AreEqual("No late orders have been saved!", outputGetOrdersAsProviderResponseWrapper.ResponseMessage);
+            Assert.AreEqual("No orders have been saved!", outputGetOrdersAsProviderResponseWrapper.ResponseMessage);
         }
 
         private List<OrderDTO> CreateOrderDTOList(int numOfOrder)

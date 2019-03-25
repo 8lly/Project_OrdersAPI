@@ -8,7 +8,6 @@ namespace StockAPI.Models
     public class ProviderResponseWrapperCopy
     {
         public string ResponseMessage { get; set; }
-        public int ResponseType { get; set; }
         public HTTPResponseCodes ResponseHTMLType { get; set; }
     }
     
