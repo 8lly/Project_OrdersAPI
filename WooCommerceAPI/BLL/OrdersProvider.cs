@@ -19,6 +19,7 @@ namespace WooCommerceAPI.BLL
         // Repository obj
         private readonly IOrdersRepository _ordersRepository;
         PRWBuilderHelper prwBuilderHelper = new PRWBuilderHelper();
+        DoesOrderContainItemsHelper doesOrderHelper = new DoesOrderContainItemsHelper();
 
         public OrdersProvider(IOrdersRepository gop)
         {
@@ -95,9 +96,9 @@ namespace WooCommerceAPI.BLL
                     return prwBuilderHelper.PRWBuilder("Some fields are completed incorrect. Please re-enter values again.", HTTPResponseCodes.HTTP_BAD_REQUEST);
                 }
             }
-            catch (ArgumentNullException ex)
+            catch (NullReferenceException ex)
             {
-                return prwBuilderHelper.PRWBuilder(ex.ToString(), HTTPResponseCodes.HTTP_BAD_REQUEST);
+                return prwBuilderHelper.PRWBuilder("The form has not been fully complete, please send a completed form.", HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
             catch (Exception ex1)
             {
@@ -219,7 +220,7 @@ namespace WooCommerceAPI.BLL
                 }
                 return prwBuilderHelper.PRWBuilder("No record found with given Order ID", HTTPResponseCodes.HTTP_NOT_FOUND);
             }
-            catch (ArgumentNullException ex)
+            catch (NullReferenceException ex)
             {
                 return prwBuilderHelper.PRWBuilder("No Order ID was given, please enter an Order ID", HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
@@ -254,7 +255,7 @@ namespace WooCommerceAPI.BLL
                     // allocatedItems.RemoveAll(string.IsNullOrWhiteSpace);
 
                     // Only run this method if the removed order contained items
-                    if (DoesOrderContainItems(removedOrder.SKU, allocatedItems) == true)
+                    if (doesOrderHelper.DoesOrderContainItems(removedOrder.SKU, allocatedItems) == true)
                     {
                         await ReallocatedRemovedOrderStock(allocatedItems);
                     }
@@ -291,39 +292,5 @@ namespace WooCommerceAPI.BLL
                 return prwBuilderHelper.PRWBuilder(ex.ToString(), HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
     }
-
-        // Assist method to determine if order contained items 
-        public bool DoesOrderContainItems(string sku, List<string> items)
-        {
-            // If SKU has 6 items assosiated
-            if ((sku == "SKU000001") || (sku == "SKU000002") || (sku == "SKU000004"))
-            {
-                items.RemoveRange(items.Count - 2, 2);
-                if (items.Any(o => o != null))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            // If SKU has 7 items assosiated
-            /**
-             * .....
-             */
-            // If SKU has 8 items assosiated
-            else
-            {
-                if (items.Any(x => x != null))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }        
-        }
     }
 }

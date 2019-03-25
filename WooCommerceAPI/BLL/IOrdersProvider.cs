@@ -17,6 +17,5 @@ namespace WooCommerceAPI.BLL
         ProviderResponseWrapperCopy GetOrder(string orderID);
         Task<ProviderResponseWrapperCopy> RemoveOrder(string orderID);
         Task<ProviderResponseWrapperCopy> ReallocatedRemovedOrderStock(List<string> reallocatedStock);
-        bool DoesOrderContainItems(string sku, List<string> items);
     }
 }
