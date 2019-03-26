@@ -164,9 +164,9 @@ namespace WooCommerceAPI.BLL
                     // Read stock in message into var
                     string response = await httpResponse.Content.ReadAsStringAsync();
 
+                    // CHECK THIS ACTUALLY WORKS 
                     // Deserialize http response string into return format
-                    string boxStock = JsonConvert.DeserializeObject<string>(response);
-                    return prwBuilderHelper.PRWBuilder(boxStock, HTTPResponseCodes.HTTP_OK_RESPONSE);
+                    return prwBuilderHelper.PRWBuilder(response, HTTPResponseCodes.HTTP_OK_RESPONSE);
                 }
                 return prwBuilderHelper.PRWBuilder("The SKU field is null. Please enter something in the field.", HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
