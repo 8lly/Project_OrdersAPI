@@ -24,7 +24,7 @@ namespace OrdersAPITests.OrdersProviderTests
         public void TestRemoveOrderValidID()
         {
             // Arrange
-            string validOrderID = "5c979252a7d6851258d7b575";
+            // string validOrderID = "5c979252a7d6851258d7b575";
 
             // Act
            // _mockOrderRepository.Setup(x => x.RemoveOrder(It.IsAny<string>())).Returns("");

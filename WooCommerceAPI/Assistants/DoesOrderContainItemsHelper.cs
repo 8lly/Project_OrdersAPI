@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OrdersAPI.Helpers
+namespace OrdersAPI.Assistants
 {
     public class DoesOrderContainItemsHelper
     {

@@ -5,6 +5,8 @@ using StockAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using OrdersAPI.Interfaces;
+using OrdersAPI.Wrapper;
 using WooCommerceAPI.BLL;
 using WooCommerceAPI.DAL;
 
@@ -30,8 +32,8 @@ namespace OrdersAPITests.OrdersProviderTests
 
             // Act
             _mockOrderRepository.Setup(x => x.CreateOrderDocument(It.IsAny<OrderDTO>())).Returns("New item Inserted");
-            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object);
-            ProviderResponseWrapperCopy outputCreateOrderDocumentsAsProviderResponseWrapper = orderProvider.CreateOrderDocument(newValidTestOrder);
+            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object, null);
+            ProviderResponseWrapper outputCreateOrderDocumentsAsProviderResponseWrapper = orderProvider.CreateOrderDocument(newValidTestOrder);
 
             // Assert
             Assert.AreEqual("New item Inserted", outputCreateOrderDocumentsAsProviderResponseWrapper.ResponseMessage);
@@ -46,8 +48,8 @@ namespace OrdersAPITests.OrdersProviderTests
             Order newInvalidTestOrder = CreateTestOrder(nullCustomerFirst);
 
             // Act
-            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object);
-            ProviderResponseWrapperCopy outputCreateOrderDocumentsAsProviderResponseWrapper = orderProvider.CreateOrderDocument(newInvalidTestOrder);
+            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object, null);
+            ProviderResponseWrapper outputCreateOrderDocumentsAsProviderResponseWrapper = orderProvider.CreateOrderDocument(newInvalidTestOrder);
 
             // Assert
             Assert.AreEqual("Some fields are completed incorrect. Please re-enter values again.", outputCreateOrderDocumentsAsProviderResponseWrapper.ResponseMessage);
@@ -60,8 +62,8 @@ namespace OrdersAPITests.OrdersProviderTests
             // Arrange 
             Order newNullTestOrder = null;
 
-            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object);
-            ProviderResponseWrapperCopy outputCreateOrderDocumentsAsProviderResponseWrapper = orderProvider.CreateOrderDocument(newNullTestOrder);
+            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object, null);
+            ProviderResponseWrapper outputCreateOrderDocumentsAsProviderResponseWrapper = orderProvider.CreateOrderDocument(newNullTestOrder);
 
             // Assert
             Assert.AreEqual("The form has not been fully complete, please send a completed form.", outputCreateOrderDocumentsAsProviderResponseWrapper.ResponseMessage);

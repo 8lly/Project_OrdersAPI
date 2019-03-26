@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace StockAPI.Models
+﻿namespace OrdersAPI.Wrapper
 {
-    public class ProviderResponseWrapperCopy
+    public class ProviderResponseWrapper
     {
         public string ResponseMessage { get; set; }
         public HTTPResponseCodes ResponseHTMLType { get; set; }

@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OrdersAPI.Interfaces;
+using OrdersAPI.Wrappers;
 using Swashbuckle.AspNetCore.Swagger;
 using WooCommerceAPI.BLL;
 using WooCommerceAPI.DAL;
@@ -32,6 +34,8 @@ namespace WooCommerceAPI
 
             services.AddSingleton<IOrdersProvider, OrdersProvider>();
             services.AddSingleton<IOrdersRepository, OrdersRepository>();
+            // Research into the logic behind this dependency injection....
+            services.AddSingleton<IHttpClientWrapper, HttpClientWrapper>();
 
             services.AddSwaggerGen(c =>
             {

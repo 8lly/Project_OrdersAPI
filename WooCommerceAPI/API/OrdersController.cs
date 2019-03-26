@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using OrdersAPI.Helpers;
+using OrdersAPI.Assistants;
 using OrdersAPI.Models;
-using StockAPI.Models;
+using OrdersAPI.Wrapper;
 using WooCommerceAPI.BLL;
-using WooCommerceAPI.Models;
 
 namespace WooCommerceAPI.Controllers
 {
@@ -20,7 +19,7 @@ namespace WooCommerceAPI.Controllers
     {
         private readonly IOrdersProvider _ordersProvider;
         // How do I initialise this class
-        APIJsonResultResponseHelper apiJsonResponse = new APIJsonResultResponseHelper();
+        APIJsonResultResponseHelper apiJsonResponse = new APIJsonResultResponseHelper();        
 
         // Create instance of Provider
         public WooController(IOrdersProvider op)
@@ -46,13 +45,13 @@ namespace WooCommerceAPI.Controllers
         {
             try
             {
-                ProviderResponseWrapperCopy providerResponse = _ordersProvider.GetLateOrders();
+                ProviderResponseWrapper providerResponse = _ordersProvider.GetLateOrders();
                 return apiJsonResponse.CreateJsonResultResponse(providerResponse);
             }
             // If error with upper API level
             catch (Exception ex)
             {
-                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
+                ProviderResponseWrapper apiUnavaliableResponse = new ProviderResponseWrapper
                 {
                     ResponseMessage = ex.ToString(),
                     ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
@@ -71,12 +70,12 @@ namespace WooCommerceAPI.Controllers
         {
             try
             {
-                ProviderResponseWrapperCopy providerResponse = _ordersProvider.GetOrders();
+                ProviderResponseWrapper providerResponse = _ordersProvider.GetOrders();
                 return apiJsonResponse.CreateJsonResultResponse(providerResponse);
             } 
             catch (Exception ex)
             {
-                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
+                ProviderResponseWrapper apiUnavaliableResponse = new ProviderResponseWrapper
                 {
                     ResponseMessage = ex.ToString(),
                     ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
@@ -95,12 +94,12 @@ namespace WooCommerceAPI.Controllers
         {
             try
             {
-                ProviderResponseWrapperCopy providerResponse = _ordersProvider.GetOrder(orderID);
+                ProviderResponseWrapper providerResponse = _ordersProvider.GetOrder(orderID);
                 return apiJsonResponse.CreateJsonResultResponse(providerResponse);
             }
             catch (Exception ex)
             {
-                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
+                ProviderResponseWrapper apiUnavaliableResponse = new ProviderResponseWrapper
                 {
                     ResponseMessage = ex.ToString(),
                     ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
@@ -118,12 +117,12 @@ namespace WooCommerceAPI.Controllers
         {
             try
             {
-                ProviderResponseWrapperCopy providerResponse = _ordersProvider.CreateOrderDocument(newOrder);
+                ProviderResponseWrapper providerResponse = _ordersProvider.CreateOrderDocument(newOrder);
                 return apiJsonResponse.CreateJsonResultResponse(providerResponse);         
             }
             catch (Exception ex)
             {
-                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
+                ProviderResponseWrapper apiUnavaliableResponse = new ProviderResponseWrapper
                 {
                     ResponseMessage = ex.ToString(),
                     ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
@@ -142,16 +141,16 @@ namespace WooCommerceAPI.Controllers
         {
             try
             {
-                ProviderResponseWrapperCopy jsonOrder = _ordersProvider.GetOrder(orderID);
+                ProviderResponseWrapper jsonOrder = _ordersProvider.GetOrder(orderID);
                 //  GET response from StockAPI with OrderFullfillment Stock
-                ProviderResponseWrapperCopy response = await _ordersProvider.BoxOrderCreateAsync(orderID);
+                ProviderResponseWrapper response = await _ordersProvider.BoxOrderCreateAsync(orderID);
                 string jsonBoxOrderCreate = response.ResponseMessage;
 
                 // Okay response from BoxOrderCreateAsync 
                 if ((int)response.ResponseHTMLType == 200)
                 {
                     // Save items to the order document 
-                    ProviderResponseWrapperCopy providerResponseAsProviderResponseWrapper = _ordersProvider.AssignOrderItems(orderID, jsonOrder.ResponseMessage, jsonBoxOrderCreate);
+                    ProviderResponseWrapper providerResponseAsProviderResponseWrapper = _ordersProvider.AssignOrderItems(orderID, jsonOrder.ResponseMessage, jsonBoxOrderCreate);
                     return apiJsonResponse.CreateJsonResultResponse(providerResponseAsProviderResponseWrapper);
                 }
                 // Error Response
@@ -163,7 +162,7 @@ namespace WooCommerceAPI.Controllers
             // API error
             catch (Exception ex)
             {
-                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
+                ProviderResponseWrapper apiUnavaliableResponse = new ProviderResponseWrapper
                 {
                     ResponseMessage = ex.ToString(),
                     ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
@@ -179,12 +178,12 @@ namespace WooCommerceAPI.Controllers
         {
             try
             {
-                ProviderResponseWrapperCopy providerResponse = _ordersProvider.ModifyOrderStatus(orderID, statusType);
+                ProviderResponseWrapper providerResponse = _ordersProvider.ModifyOrderStatus(orderID, statusType);
                 return apiJsonResponse.CreateJsonResultResponse(providerResponse);      
             }
             catch (Exception ex)
             {
-                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
+                ProviderResponseWrapper apiUnavaliableResponse = new ProviderResponseWrapper
                 {
                     ResponseMessage = ex.ToString(),
                     ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
@@ -201,12 +200,12 @@ namespace WooCommerceAPI.Controllers
         {
             try
             {
-                ProviderResponseWrapperCopy providerResponse =  _ordersProvider.RemoveCompletedOrders();
+                ProviderResponseWrapper providerResponse =  _ordersProvider.RemoveCompletedOrders();
                 return apiJsonResponse.CreateJsonResultResponse(providerResponse);                
             }
             catch (Exception ex)
             {
-                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
+                ProviderResponseWrapper apiUnavaliableResponse = new ProviderResponseWrapper
                 {
                     ResponseMessage = ex.ToString(),
                     ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE
@@ -221,12 +220,12 @@ namespace WooCommerceAPI.Controllers
         {
             try
             {
-                ProviderResponseWrapperCopy providerResponse = await _ordersProvider.RemoveOrder(orderID);
+                ProviderResponseWrapper providerResponse = await _ordersProvider.RemoveOrder(orderID);
                 return apiJsonResponse.CreateJsonResultResponse(providerResponse);
             }
             catch (Exception ex)
             {
-                ProviderResponseWrapperCopy apiUnavaliableResponse = new ProviderResponseWrapperCopy
+                ProviderResponseWrapper apiUnavaliableResponse = new ProviderResponseWrapper
                 {
                     ResponseMessage = ex.ToString(),
                     ResponseHTMLType = HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE

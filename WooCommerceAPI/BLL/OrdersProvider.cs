@@ -1,32 +1,32 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using OrdersAPI.Helpers;
+﻿using Newtonsoft.Json;
 using OrdersAPI.Models;
 using StockAPI.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+using OrdersAPI.Wrapper;
 using WooCommerceAPI.DAL;
+using OrdersAPI.Assistants;
+using OrdersAPI.Interfaces;
 
 namespace WooCommerceAPI.BLL
 {
     public class OrdersProvider : IOrdersProvider
     {
-        // Repository obj
+        // HOW CAN I CHANGE THIS TO BE PROPER
         private readonly IOrdersRepository _ordersRepository;
+        private readonly IHttpClientWrapper _httpClient;
         PRWBuilderHelper prwBuilderHelper = new PRWBuilderHelper();
         DoesOrderContainItemsHelper doesOrderHelper = new DoesOrderContainItemsHelper();
 
-        public OrdersProvider(IOrdersRepository gop)
+        public OrdersProvider(IOrdersRepository gop, IHttpClientWrapper hcw)
         {
             _ordersRepository = gop;
+            _httpClient = hcw;
         }
 
-        public ProviderResponseWrapperCopy GetOrders()
+        public ProviderResponseWrapper GetOrders()
         {
             try
             {
@@ -47,7 +47,7 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public ProviderResponseWrapperCopy GetLateOrders()
+        public ProviderResponseWrapper GetLateOrders()
         {
             try
             {
@@ -68,7 +68,7 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public ProviderResponseWrapperCopy CreateOrderDocument(Order newOrder)
+        public ProviderResponseWrapper CreateOrderDocument(Order newOrder)
         {
             try
             {
@@ -96,7 +96,7 @@ namespace WooCommerceAPI.BLL
                     return prwBuilderHelper.PRWBuilder("Some fields are completed incorrect. Please re-enter values again.", HTTPResponseCodes.HTTP_BAD_REQUEST);
                 }
             }
-            catch (NullReferenceException ex)
+            catch (NullReferenceException)
             {
                 return prwBuilderHelper.PRWBuilder("The form has not been fully complete, please send a completed form.", HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
@@ -106,7 +106,7 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public ProviderResponseWrapperCopy RemoveCompletedOrders()
+        public ProviderResponseWrapper RemoveCompletedOrders()
         {
             try
             {
@@ -126,7 +126,7 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public ProviderResponseWrapperCopy ModifyOrderStatus(string orderID, string statusType)
+        public ProviderResponseWrapper ModifyOrderStatus(string orderID, string statusType)
         {
             try
             {
@@ -146,7 +146,7 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public async Task<ProviderResponseWrapperCopy> BoxOrderCreateAsync(string orderID)
+        public async Task<ProviderResponseWrapper> BoxOrderCreateAsync(string orderID)
         {
             try
             {
@@ -160,7 +160,7 @@ namespace WooCommerceAPI.BLL
                     string uri = "http://localhost:55001/api/Stock/OrderFulfillmentStock?orderSKU=" + sku;
 
                     // Returned Message
-                    HttpResponseMessage httpResponse = client.GetAsync(uri).Result;
+                    HttpResponseMessage httpResponse = _httpClient.GetAsync(uri).Result;
                     // Read stock in message into var
                     string response = await httpResponse.Content.ReadAsStringAsync();
 
@@ -178,7 +178,7 @@ namespace WooCommerceAPI.BLL
             {
                 return prwBuilderHelper.PRWBuilder("Failed to contact to Stock API. Please try later.", HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
-            catch (NullReferenceException ex)
+            catch (NullReferenceException)
             {
                 return prwBuilderHelper.PRWBuilder("Not enough stock is eligible to fulfill the order.", HTTPResponseCodes.HTTP_NOT_FOUND);
             }
@@ -188,7 +188,7 @@ namespace WooCommerceAPI.BLL
             }
         }
         
-        public ProviderResponseWrapperCopy AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate)
+        public ProviderResponseWrapper AssignOrderItems(string orderID, string jsonOrder, string jsonBoxOrderCreate)
         {
             try
             {
@@ -208,7 +208,7 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public ProviderResponseWrapperCopy GetOrder(string orderID)
+        public ProviderResponseWrapper GetOrder(string orderID)
         {
             try
             {
@@ -220,7 +220,7 @@ namespace WooCommerceAPI.BLL
                 }
                 return prwBuilderHelper.PRWBuilder("No record found with given Order ID", HTTPResponseCodes.HTTP_NOT_FOUND);
             }
-            catch (NullReferenceException ex)
+            catch (NullReferenceException)
             {
                 return prwBuilderHelper.PRWBuilder("No Order ID was given, please enter an Order ID", HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
@@ -230,7 +230,7 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public async Task<ProviderResponseWrapperCopy> RemoveOrder(string orderID)
+        public async Task<ProviderResponseWrapper> RemoveOrder(string orderID)
         {
             try
             {
@@ -271,7 +271,7 @@ namespace WooCommerceAPI.BLL
             }
         }
 
-        public async Task<ProviderResponseWrapperCopy> ReallocatedRemovedOrderStock(List<string> reallocatedStockList)
+        public async Task<ProviderResponseWrapper> ReallocatedRemovedOrderStock(List<string> reallocatedStockList)
         {
             try
             {
@@ -282,7 +282,7 @@ namespace WooCommerceAPI.BLL
                 {
                     // How to get rid of this?
                     var content = new StringContent("");
-                    HttpResponseMessage response = await client.PostAsync($"{requestURI}/?body={reallocatedStockList[x]}", content);
+                    HttpResponseMessage response = await _httpClient.PostAsync($"{requestURI}/?body={reallocatedStockList[x]}", content);
                 }
 
                 return prwBuilderHelper.PRWBuilder("Order Successfully Removed", HTTPResponseCodes.HTTP_OK_RESPONSE);

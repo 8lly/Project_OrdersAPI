@@ -1,17 +1,18 @@
-﻿using StockAPI.Models;
+﻿using OrdersAPI.Wrapper;
+using StockAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OrdersAPI.Helpers
+namespace OrdersAPI.Assistants
 {
     public class PRWBuilderHelper
     {
         // Build exception messages 
-        public ProviderResponseWrapperCopy PRWBuilder(string json, HTTPResponseCodes httpResponse)
+        public ProviderResponseWrapper PRWBuilder(string json, HTTPResponseCodes httpResponse)
         {
-            ProviderResponseWrapperCopy response = new ProviderResponseWrapperCopy
+            ProviderResponseWrapper response = new ProviderResponseWrapper
             {
                 ResponseMessage = json,
                 ResponseHTMLType = httpResponse
