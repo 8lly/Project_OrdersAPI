@@ -7,12 +7,12 @@ using System.ComponentModel;
 using System.Net.Http;
 using System.Text;
 
-
-/*
 namespace OrdersAPITests.OrdersProviderTests
 {
     class BoxOrderCreateAsyncTests
     {
+
+        private Mock<HttpMessageHandler> _mockHttpMessageHandler;
 
         [Test]
         public void BoxorderCreateGetGoodResponse()
@@ -35,4 +35,3 @@ namespace OrdersAPITests.OrdersProviderTests
         }
     }
 }
-*/

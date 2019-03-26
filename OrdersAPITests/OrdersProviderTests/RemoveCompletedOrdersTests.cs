@@ -1,6 +1,5 @@
 ﻿using Moq;
 using NUnit.Framework;
-using OrdersAPI.Wrapper;
 using StockAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -25,8 +24,8 @@ namespace OrdersAPITests.OrdersProviderTests
         {
             // Act
             _mockOrderRepository.Setup(x => x.RemoveCompletedOrders()).Returns("Completed Orders Cleared");
-            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object, null);
-            ProviderResponseWrapper outputRemoveAllCompletedOrdersAsProviderResponseWrapper = orderProvider.RemoveCompletedOrders();
+            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object);
+            ProviderResponseWrapperCopy outputRemoveAllCompletedOrdersAsProviderResponseWrapper = orderProvider.RemoveCompletedOrders();
 
             // Assert
             Assert.AreEqual("Completed Orders Cleared", outputRemoveAllCompletedOrdersAsProviderResponseWrapper.ResponseMessage);

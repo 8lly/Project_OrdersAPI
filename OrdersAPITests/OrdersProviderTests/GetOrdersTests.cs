@@ -4,7 +4,6 @@ using NUnit.Framework;
 using OrdersAPI.Models;
 using StockAPI.Models;
 using System.Collections.Generic;
-using OrdersAPI.Wrapper;
 using WooCommerceAPI.BLL;
 using WooCommerceAPI.DAL;
 
@@ -27,8 +26,8 @@ namespace OrdersAPITests.OrdersProviderTests
             // Act
             _mockOrderRepository.Setup(x => x.GetOrders()).Returns(CreateOrderDTOList(1));
             // Is this meant to be orderprovider or orderscontroller
-            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object, null);
-            ProviderResponseWrapper outputGetOrdersAsProviderResponseWrapper = orderProvider.GetOrders();
+            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object);
+            ProviderResponseWrapperCopy outputGetOrdersAsProviderResponseWrapper = orderProvider.GetOrders();
             List<OrderDTO> outputOrderList = JsonConvert.DeserializeObject<List<OrderDTO>>(outputGetOrdersAsProviderResponseWrapper.ResponseMessage);
 
             // Assert
@@ -42,8 +41,8 @@ namespace OrdersAPITests.OrdersProviderTests
         {
             // Act
             _mockOrderRepository.Setup(x => x.GetOrders()).Returns(CreateOrderDTOList(1000));
-            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object, null);
-            ProviderResponseWrapper outputGetOrdersAsProviderResponseWrapper = orderProvider.GetOrders();
+            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object);
+            ProviderResponseWrapperCopy outputGetOrdersAsProviderResponseWrapper = orderProvider.GetOrders();
             List<OrderDTO> outputOrderList = JsonConvert.DeserializeObject<List<OrderDTO>>(outputGetOrdersAsProviderResponseWrapper.ResponseMessage);
 
             // Assert
@@ -60,8 +59,8 @@ namespace OrdersAPITests.OrdersProviderTests
         {
             // Act
             _mockOrderRepository.Setup(x => x.GetOrders()).Returns(CreateOrderDTOList(0));
-            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object, null);
-            ProviderResponseWrapper outputGetOrdersAsProviderResponseWrapper = orderProvider.GetOrders();
+            OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object);
+            ProviderResponseWrapperCopy outputGetOrdersAsProviderResponseWrapper = orderProvider.GetOrders();
 
             // Assert
             Assert.AreEqual("No orders have been saved!", outputGetOrdersAsProviderResponseWrapper.ResponseMessage);
