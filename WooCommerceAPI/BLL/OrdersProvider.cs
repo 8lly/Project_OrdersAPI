@@ -93,12 +93,8 @@ namespace WooCommerceAPI.BLL
                 }
                 else
                 {
-                    return prwBuilderHelper.PRWBuilder("Some fields are completed incorrect. Please re-enter values again.", HTTPResponseCodes.HTTP_BAD_REQUEST);
+                    return prwBuilderHelper.PRWBuilder("The form has missing information or is incorrect. Please re-enter values again.", HTTPResponseCodes.HTTP_BAD_REQUEST);
                 }
-            }
-            catch (NullReferenceException)
-            {
-                return prwBuilderHelper.PRWBuilder("The form has not been fully complete, please send a completed form.", HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
             catch (Exception ex1)
             {
@@ -137,8 +133,14 @@ namespace WooCommerceAPI.BLL
                 }
                 else
                 {
-                    return prwBuilderHelper.PRWBuilder("Database failure. Please try again sure.", HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
+                    return prwBuilderHelper.PRWBuilder("Database failure. Please try again sure.",
+                        HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
                 }
+            }
+            catch (NullReferenceException)
+            {
+                return prwBuilderHelper.PRWBuilder("Both fields must contain values for this function.",
+                    HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
             catch (Exception ex)
             {

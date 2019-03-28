@@ -37,7 +37,7 @@ namespace WooCommerceAPI.Controllers
 
         // GET: ALL LATE ORDER DOCUMENTS
         [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         [HttpGet]
         [Route("GetLateOrders")]
@@ -180,6 +180,8 @@ namespace WooCommerceAPI.Controllers
         }
 
         // TODO
+        [ProducesResponseType(200)]
+        [ProducesResponseType(500)]
         [HttpPut]
         [Route("ModifyOrder")]
         public JsonResult ModifyOrderStatus(string orderID, string statusType)
@@ -222,6 +224,9 @@ namespace WooCommerceAPI.Controllers
             }
         }
 
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         [HttpDelete]
         [Route("RemoveOrder")]
         public async Task<JsonResult> RemoveOrder(string orderID)

@@ -77,7 +77,7 @@ namespace OrdersAPITests.OrdersProviderTests
                 newTestOrder.Customer_Last = "test";
                 newTestOrder.Order_Number = "000000";
                 newTestOrder.SKU = "SKU000001";
-                newTestOrder.Status = "Avaliable";
+                newTestOrder.Status = "Awaiting Action";
             };
             return newTestOrder;
         }
