@@ -143,20 +143,28 @@ namespace WooCommerceAPI.Controllers
             {
                 ProviderResponseWrapper jsonOrder = _ordersProvider.GetOrder(orderID);
                 //  GET response from StockAPI with OrderFullfillment Stock
-                ProviderResponseWrapper response = await _ordersProvider.BoxOrderCreateAsync(orderID);
-                string jsonBoxOrderCreate = response.ResponseMessage;
-
-                // Okay response from BoxOrderCreateAsync 
-                if ((int)response.ResponseHTMLType == 200)
+                if ((int) jsonOrder.ResponseHTMLType == 200)
                 {
-                    // Save items to the order document 
-                    ProviderResponseWrapper providerResponseAsProviderResponseWrapper = _ordersProvider.AssignOrderItems(orderID, jsonOrder.ResponseMessage, jsonBoxOrderCreate);
-                    return apiJsonResponse.CreateJsonResultResponse(providerResponseAsProviderResponseWrapper);
+                    ProviderResponseWrapper response = await _ordersProvider.BoxOrderCreateAsync(orderID);
+                    string jsonBoxOrderCreate = response.ResponseMessage;
+
+                    // Okay response from BoxOrderCreateAsync 
+                    if ((int) response.ResponseHTMLType == 200)
+                    {
+                        // Save items to the order document 
+                        ProviderResponseWrapper providerResponseAsProviderResponseWrapper =
+                            _ordersProvider.AssignOrderItems(orderID, jsonOrder.ResponseMessage, jsonBoxOrderCreate);
+                        return apiJsonResponse.CreateJsonResultResponse(providerResponseAsProviderResponseWrapper);
+                    }
+                    else
+                    {
+                        return apiJsonResponse.CreateJsonResultResponse(response);
+                    }
                 }
                 // Error Response
                 else
                 {
-                    return apiJsonResponse.CreateJsonResultResponse(response);
+                    return apiJsonResponse.CreateJsonResultResponse(jsonOrder);
                 }
             }
             // API error

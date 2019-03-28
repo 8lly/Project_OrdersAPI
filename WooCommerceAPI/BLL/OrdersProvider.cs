@@ -150,29 +150,33 @@ namespace WooCommerceAPI.BLL
         {
             try
             {
-                if (orderID != null)
+                OrderDTO selectedOrder = _ordersRepository.GetOrder(orderID);
+                string sku = selectedOrder.SKU;
+
+                // Send request to OrderFullfillmentStock EndPoint in Stock API
+                HttpClient client = new HttpClient();
+                string uri = "http://localhost:55001/api/Stock/OrderFulfillmentStock?orderSKU=" + sku;
+
+                // Returned Message
+                HttpResponseMessage httpResponse = _httpClient.GetAsync(uri).Result;
+                // Read stock in message into var
+                string response = await httpResponse.Content.ReadAsStringAsync();
+
+                // Deserialize http response string into return format
+                if (httpResponse.IsSuccessStatusCode)
                 {
-                    OrderDTO selectedOrder = _ordersRepository.GetOrder(orderID);
-                    string sku = selectedOrder.SKU;
-                    
-                    // Send request to OrderFullfillmentStock EndPoint in Stock API
-                    HttpClient client = new HttpClient();
-                    string uri = "http://localhost:55001/api/Stock/OrderFulfillmentStock?orderSKU=" + sku;
-
-                    // Returned Message
-                    HttpResponseMessage httpResponse = _httpClient.GetAsync(uri).Result;
-                    // Read stock in message into var
-                    string response = await httpResponse.Content.ReadAsStringAsync();
-
-                    // CHECK THIS ACTUALLY WORKS 
-                    // Deserialize http response string into return format
-                    return prwBuilderHelper.PRWBuilder(response, HTTPResponseCodes.HTTP_OK_RESPONSE);
+                  return prwBuilderHelper.PRWBuilder(response, HTTPResponseCodes.HTTP_OK_RESPONSE);
                 }
-                return prwBuilderHelper.PRWBuilder("The SKU field is null. Please enter something in the field.", HTTPResponseCodes.HTTP_BAD_REQUEST);
+                // If response from StockAPI gave 4XX or 5XX error
+                return prwBuilderHelper.PRWBuilder(response, HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
             catch (ArgumentException)
             {
-                return prwBuilderHelper.PRWBuilder("This SKU does not exist. Please try another SKU.", HTTPResponseCodes.HTTP_BAD_REQUEST);
+                return prwBuilderHelper.PRWBuilder("This SKU does not exist. Please try another SKU.", HTTPResponseCodes.HTTP_NOT_FOUND);
+            }
+            catch (FormatException)
+            {
+                return prwBuilderHelper.PRWBuilder("This is not a valid Order ID, please try re-entering an ID.", HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
             catch (HttpRequestException)
             {
@@ -180,7 +184,7 @@ namespace WooCommerceAPI.BLL
             }
             catch (NullReferenceException)
             {
-                return prwBuilderHelper.PRWBuilder("Not enough stock is eligible to fulfill the order.", HTTPResponseCodes.HTTP_NOT_FOUND);
+                return prwBuilderHelper.PRWBuilder("Please enter a Order ID.", HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
             catch (Exception ex)
             {
@@ -192,7 +196,8 @@ namespace WooCommerceAPI.BLL
         {
             try
             {
-                List<StockCopyDTO> orderItems = JsonConvert.DeserializeObject<List<StockCopyDTO>>(jsonBoxOrderCreate);
+                string boxOrderCreate = JsonConvert.DeserializeObject<string>(jsonBoxOrderCreate);
+                List<StockCopyDTO> orderItems = JsonConvert.DeserializeObject<List<StockCopyDTO>>(boxOrderCreate);
                 OrderDTO orderObject = JsonConvert.DeserializeObject<OrderDTO>(jsonOrder);
                 string responseRepository = _ordersRepository.AssignOrderItems(orderID, orderItems, orderObject);
 
@@ -218,11 +223,18 @@ namespace WooCommerceAPI.BLL
                     string json = JsonConvert.SerializeObject(order);
                     return prwBuilderHelper.PRWBuilder(json, HTTPResponseCodes.HTTP_OK_RESPONSE);
                 }
-                return prwBuilderHelper.PRWBuilder("No record found with given Order ID", HTTPResponseCodes.HTTP_NOT_FOUND);
+                return prwBuilderHelper.PRWBuilder("No Order ID document could be found.",
+                    HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
             catch (NullReferenceException)
             {
-                return prwBuilderHelper.PRWBuilder("No Order ID was given, please enter an Order ID", HTTPResponseCodes.HTTP_BAD_REQUEST);
+                return prwBuilderHelper.PRWBuilder("No Order ID was given, please enter an Order ID",
+                    HTTPResponseCodes.HTTP_BAD_REQUEST);
+            }
+            catch (FormatException)
+            {
+                return prwBuilderHelper.PRWBuilder("The ID was not in the appropiate format, please enter a valid Order ID ",
+                    HTTPResponseCodes.HTTP_NOT_FOUND);
             }
             catch (Exception ex1)
             {

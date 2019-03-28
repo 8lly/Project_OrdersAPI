@@ -50,6 +50,39 @@ namespace OrdersAPITests.OrdersProviderTests
 
             // Asserts
             Assert.AreEqual(outputGetCompletedListOfItemsForOrderAsPRW.ResponseMessage, orderDTOjson);
+            Assert.AreEqual(HTTPResponseCodes.HTTP_OK_RESPONSE, outputGetCompletedListOfItemsForOrderAsPRW.ResponseHTMLType);
+        }
+
+        [Test]
+        public async Task TestCompletedOrderInvalidOrderID()
+        {
+            // Arrange
+            string orderDTOjson = "60242a787f13737283ef0bce";
+
+            // Act
+            OrdersProvider ordersProvider = new OrdersProvider(null, null);
+            ProviderResponseWrapper outputGetNullResponseAsPRW = await
+                ordersProvider.BoxOrderCreateAsync(orderDTOjson);
+
+            // Asserts
+            Assert.AreEqual("No Order ID document could be found.", outputGetNullResponseAsPRW.ResponseMessage);
+            Assert.AreEqual(HTTPResponseCodes.HTTP_NOT_FOUND , outputGetNullResponseAsPRW.ResponseHTMLType);
+        }
+
+        [Test]
+        public async Task TestCompleteOrderNullOrderID()
+        {
+            // Arrange
+            string orderDTOjson = null;
+
+            // Act
+            OrdersProvider ordersProvider = new OrdersProvider(null, null);
+            ProviderResponseWrapper outputGetNullResponseAsPRW = await
+                ordersProvider.BoxOrderCreateAsync(orderDTOjson);
+
+            // Asserts
+            Assert.AreEqual("Please enter a Order ID.", outputGetNullResponseAsPRW.ResponseMessage);
+            Assert.AreEqual(HTTPResponseCodes.HTTP_BAD_REQUEST, outputGetNullResponseAsPRW.ResponseHTMLType);
         }
 
         private OrderDTO CreateOrderDTO()
