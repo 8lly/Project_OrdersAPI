@@ -127,24 +127,20 @@ namespace WooCommerceAPI.BLL
             try
             {
                 string repositoryResponse = _ordersRepository.ModifyOrderStatus(orderID, statusType);
-                if (repositoryResponse == "Stock status has been adjusted.")
-                {
-                    return prwBuilderHelper.PRWBuilder(repositoryResponse, HTTPResponseCodes.HTTP_OK_RESPONSE);
-                }
-                else
-                {
-                    return prwBuilderHelper.PRWBuilder("Database failure. Please try again sure.",
-                        HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
-                }
+                return prwBuilderHelper.PRWBuilder(repositoryResponse, HTTPResponseCodes.HTTP_OK_RESPONSE);
+            }
+            catch (FormatException)
+            {
+                return prwBuilderHelper.PRWBuilder("Order ID does not exist", HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
             catch (NullReferenceException)
             {
-                return prwBuilderHelper.PRWBuilder("Both fields must contain values for this function.",
+                return prwBuilderHelper.PRWBuilder("No Order ID was given, please enter an Order ID",
                     HTTPResponseCodes.HTTP_BAD_REQUEST);
             }
-            catch (Exception ex)
+            catch (Exception ex1)
             {
-                return prwBuilderHelper.PRWBuilder(ex.ToString(), HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
+                return prwBuilderHelper.PRWBuilder(ex1.ToString(), HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
             }
         }
 

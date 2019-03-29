@@ -90,17 +90,10 @@ namespace WooCommerceAPI.DAL
 
         public string ModifyOrderStatus(string orderID, string statusType)
         {
-            try
-            {
-                OrderDTO modifiedOrder = _order.Find(OrderDTO => OrderDTO.Id == orderID).FirstOrDefault();
-                modifiedOrder.Status = statusType;
-                _order.ReplaceOneAsync(x => x.Id == modifiedOrder.Id, modifiedOrder);
-                return "Stock status has been adjusted.";
-            }
-            catch (Exception ex)
-            {
-                return ex.ToString();
-            }
+            OrderDTO modifiedOrder = _order.Find(OrderDTO => OrderDTO.Id == orderID).FirstOrDefault();
+            modifiedOrder.Status = statusType;
+            _order.ReplaceOneAsync(x => x.Id == modifiedOrder.Id, modifiedOrder);
+            return "Stock status has been adjusted.";
         }
 
         public OrderDTO GetOrder(string orderID)
