@@ -18,7 +18,6 @@ namespace WooCommerceAPI.BLL
         private readonly IOrdersRepository _ordersRepository;
         private readonly IHttpClientWrapper _httpClient;
         PRWBuilderHelper prwBuilderHelper = new PRWBuilderHelper();
-        DoesOrderContainItemsHelper doesOrderHelper = new DoesOrderContainItemsHelper();
 
         public OrdersProvider(IOrdersRepository gop, IHttpClientWrapper hcw)
         {
@@ -263,6 +262,8 @@ namespace WooCommerceAPI.BLL
 
                     // Remove nulls from list 
                     // allocatedItems.RemoveAll(string.IsNullOrWhiteSpace);
+
+                    DoesOrderContainItemsHelper doesOrderHelper = new DoesOrderContainItemsHelper();
 
                     // Only run this method if the removed order contained items
                     if (doesOrderHelper.DoesOrderContainItems(removedOrder.SKU, allocatedItems) == true)

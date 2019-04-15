@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using OrdersAPI.Assistants;
@@ -39,6 +40,7 @@ namespace WooCommerceAPI.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
+        [EnableCors("CorsPolicy")]
         [HttpGet]
         [Route("GetLateOrders")]
         public JsonResult GetLateOrders()
@@ -64,6 +66,7 @@ namespace WooCommerceAPI.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
+        [EnableCors("CorsPolicy")]
         [HttpGet]
         [Route("GetOrders")]
         public JsonResult GetOrders()
@@ -88,6 +91,7 @@ namespace WooCommerceAPI.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
+        [EnableCors("CorsPolicy")]
         [HttpGet]
         [Route("GetOrder")]
         public JsonResult GetOrder(string orderID)
@@ -111,6 +115,7 @@ namespace WooCommerceAPI.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
+        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("ImportOrder")]
         public JsonResult CreateOrderDocument([FromBody] Order newOrder)
@@ -135,6 +140,7 @@ namespace WooCommerceAPI.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
+        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("AssignOrderItems")]
         public async Task<JsonResult> AssignOrderItems(string orderID)
@@ -182,6 +188,7 @@ namespace WooCommerceAPI.Controllers
         // TODO
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]
+        [EnableCors("CorsPolicy")]
         [HttpPut]
         [Route("ModifyOrder")]
         public JsonResult ModifyOrderStatus(string orderID, string statusType)
@@ -204,6 +211,7 @@ namespace WooCommerceAPI.Controllers
 
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]
+        [EnableCors("CorsPolicy")]
         [HttpDelete]
         [Route("RemoveCompletedOrders")]
         public JsonResult RemoveCompletedOrders()
@@ -227,6 +235,7 @@ namespace WooCommerceAPI.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
+        [EnableCors("CorsPolicy")]
         [HttpDelete]
         [Route("RemoveOrder")]
         public async Task<JsonResult> RemoveOrder(string orderID)
