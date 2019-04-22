@@ -152,7 +152,7 @@ namespace WooCommerceAPI.BLL
 
                 // Send request to OrderFullfillmentStock EndPoint in Stock API
                 HttpClient client = new HttpClient();
-                string uri = "http://localhost:55001/api/Stock/OrderFulfillmentStock?orderSKU=" + sku;
+                string uri = "http://localhost:52772/api/Stock/OrderFulfillmentStock?orderSKU=" + sku;
 
                 // Returned Message
                 HttpResponseMessage httpResponse = _httpClient.GetAsync(uri).Result;
@@ -287,7 +287,7 @@ namespace WooCommerceAPI.BLL
             try
             {
                 HttpClient client = new HttpClient();
-                string requestURI = "http://localhost:55001/api/Stock/UpdateStockAddAllocation";
+                string requestURI = "http://localhost:52772/api/Stock/UpdateStockAddAllocation";
 
                 for (int x = 0; x < reallocatedStockList.Count; x++)
                 {

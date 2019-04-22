@@ -132,7 +132,7 @@ namespace WooCommerceAPI.DAL
         public OrderDTO RemoveOrder(string orderID)
         {
             OrderDTO removedOrder = _order.Find(x => x.Id == orderID).FirstOrDefault();
-            // _order.DeleteOneAsync(x => x.Id == orderID);
+            _order.DeleteOneAsync(x => x.Id == orderID);
             return removedOrder;
         }
     }

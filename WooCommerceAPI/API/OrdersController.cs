@@ -118,7 +118,7 @@ namespace WooCommerceAPI.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("ImportOrder")]
-        public JsonResult CreateOrderDocument([FromBody] Order newOrder)
+        public JsonResult CreateOrderDocument(Order newOrder)
         {
             try
             {
@@ -185,7 +185,7 @@ namespace WooCommerceAPI.Controllers
             }
         }
 
-        // TODO
+        // Remove Status Type
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]
         [EnableCors("CorsPolicy")]
