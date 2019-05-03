@@ -31,6 +31,5 @@ namespace OrdersAPITests.OrdersProviderTests
             // Assert
             Assert.AreEqual("Completed Orders Cleared", outputRemoveAllCompletedOrdersAsProviderResponseWrapper.ResponseMessage);
         }
-
     }
 }

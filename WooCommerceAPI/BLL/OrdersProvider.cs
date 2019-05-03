@@ -58,7 +58,7 @@ namespace WooCommerceAPI.BLL
                 }
                 else
                 {
-                    return prwBuilderHelper.PRWBuilder("No orders have been saved!", HTTPResponseCodes.HTTP_NOT_FOUND);
+                    return prwBuilderHelper.PRWBuilder("No late orders", HTTPResponseCodes.HTTP_NOT_FOUND);
                 }
             }
             catch (Exception ex1)
@@ -112,7 +112,7 @@ namespace WooCommerceAPI.BLL
                 }
                 else
                 {
-                    return prwBuilderHelper.PRWBuilder("Database failure. Please try again sure.", HTTPResponseCodes.HTTP_SERVER_FAILURE_RESPONSE);
+                    return prwBuilderHelper.PRWBuilder("No Completed Orders Exist", HTTPResponseCodes.HTTP_NOT_FOUND);
                 }
             } 
             catch (Exception ex)
@@ -270,10 +270,17 @@ namespace WooCommerceAPI.BLL
                     {
                         await ReallocatedRemovedOrderStock(allocatedItems);
                     }
-                    return prwBuilderHelper.PRWBuilder("Record has been successfully removed", HTTPResponseCodes.HTTP_OK_RESPONSE);
+
+                    return prwBuilderHelper.PRWBuilder("Record has been successfully removed",
+                        HTTPResponseCodes.HTTP_OK_RESPONSE);
                 }
-                // Order ID does not exist, or is incorrect 
-                return prwBuilderHelper.PRWBuilder("No record matches given Order ID", HTTPResponseCodes.HTTP_NOT_FOUND);
+                return prwBuilderHelper.PRWBuilder("No Order ID was given",
+                    HTTPResponseCodes.HTTP_NOT_FOUND);
+            }
+            catch (FormatException)
+            {
+                return prwBuilderHelper.PRWBuilder("No record matches given Order ID",
+                    HTTPResponseCodes.HTTP_NOT_FOUND);
             }
             // Back-end failures 
             catch (Exception ex)

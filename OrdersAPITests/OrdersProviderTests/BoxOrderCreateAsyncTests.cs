@@ -29,7 +29,6 @@ namespace OrdersAPITests.OrdersProviderTests
             _mockOrdersRepository = new Mock<IOrdersRepository>();
         }
 
-        // Finally works!!!!!!
         [Test]
         public async Task TestGetCompletedListOfItemsForOrder()
         {
