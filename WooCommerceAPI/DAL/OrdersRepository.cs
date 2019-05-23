@@ -32,7 +32,7 @@ namespace WooCommerceAPI.DAL
         /**
         public OrdersRepository(IOptions<ConnectWC> wcOptions, IOptions<MongoSettings> mOptions)
         {
-            RestAPI rest = new RestAPI("http://www.meatbox.com/wp-json/wc/v2/", options.Value.Key1,options.Value.Key2);
+            RestAPI rest = new RestAPI("", options.Value.Key1,options.Value.Key2);
             wc = new WCObject(rest);
 
             Controller containing connection to MongoDB
