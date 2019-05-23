@@ -14,7 +14,6 @@ namespace WooCommerceAPI.BLL
 {
     public class OrdersProvider : IOrdersProvider
     {
-        // HOW CAN I CHANGE THIS TO BE PROPER
         private readonly IOrdersRepository _ordersRepository;
         private readonly IHttpClientWrapper _httpClient;
         PRWBuilderHelper prwBuilderHelper = new PRWBuilderHelper();
@@ -243,10 +242,10 @@ namespace WooCommerceAPI.BLL
         {
             try
             {
-                // Delete record, save copy to return freed stock
-                OrderDTO removedOrder = _ordersRepository.RemoveOrder(orderID);
-                if (removedOrder != null)
+                if (orderID != null)
                 {
+                    // Delete record, save copy to return freed stock
+                    OrderDTO removedOrder = _ordersRepository.RemoveOrder(orderID);
                     // Stock items returning to stock db
                     List<string> allocatedItems = new List<string>()
                     {
@@ -274,12 +273,12 @@ namespace WooCommerceAPI.BLL
                     return prwBuilderHelper.PRWBuilder("Record has been successfully removed",
                         HTTPResponseCodes.HTTP_OK_RESPONSE);
                 }
-                return prwBuilderHelper.PRWBuilder("No Order ID was given",
+                return prwBuilderHelper.PRWBuilder("No order exists, null given",
                     HTTPResponseCodes.HTTP_NOT_FOUND);
             }
-            catch (FormatException)
+            catch (NullReferenceException)
             {
-                return prwBuilderHelper.PRWBuilder("No record matches given Order ID",
+                return prwBuilderHelper.PRWBuilder("No record matches given order ID",
                     HTTPResponseCodes.HTTP_NOT_FOUND);
             }
             // Back-end failures 

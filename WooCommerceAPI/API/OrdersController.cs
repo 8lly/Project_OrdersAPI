@@ -112,6 +112,7 @@ namespace WooCommerceAPI.Controllers
             }
         }
 
+        // POST: IMPORT NEW ORDERS
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -185,7 +186,7 @@ namespace WooCommerceAPI.Controllers
             }
         }
 
-        // Remove Status Type
+        // PUT: MODIFY ITEM STATUS
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]
         [EnableCors("CorsPolicy")]
@@ -209,6 +210,7 @@ namespace WooCommerceAPI.Controllers
             }
         }
 
+        // DELETE: REMOVE ALL COMPLETED ORDERS
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]
         [EnableCors("CorsPolicy")]
@@ -232,6 +234,7 @@ namespace WooCommerceAPI.Controllers
             }
         }
 
+        // DELETE: REMOVE AN ORDER
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]

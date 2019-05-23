@@ -26,7 +26,6 @@ namespace OrdersAPITests.OrdersProviderTests
         {
             // Act
             _mockOrderRepository.Setup(x => x.GetOrders()).Returns(CreateOrderDTOList(1));
-            // Is this meant to be orderprovider or orderscontroller
             OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object, null);
             ProviderResponseWrapper outputGetOrdersAsProviderResponseWrapper = orderProvider.GetOrders();
             List<OrderDTO> outputOrderList = JsonConvert.DeserializeObject<List<OrderDTO>>(outputGetOrdersAsProviderResponseWrapper.ResponseMessage);

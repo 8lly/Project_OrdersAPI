@@ -29,7 +29,6 @@ namespace OrdersAPITests.OrdersProviderTests
             _mockOrdersRepository = new Mock<IOrdersRepository>();
         }
 
-        // TEST: Remove Valid OrderID
         [Test]
         public async Task TestRemoveOrderValidID()
         {
@@ -53,7 +52,6 @@ namespace OrdersAPITests.OrdersProviderTests
             Assert.AreEqual(HTTPResponseCodes.HTTP_OK_RESPONSE, outputGetRemovedItemMessageAsPRW.ResponseHTMLType);
         }
 
-        // TEST: Remove Invalid OrderID
         [Test]
         public async Task TestRemoveOrderInvalidID()
         {
@@ -66,16 +64,15 @@ namespace OrdersAPITests.OrdersProviderTests
                 ordersProvider.RemoveOrder(invalidOrderID);
 
             // Asserts
-            Assert.AreEqual("No record matches given Order ID", outputGetRemovedItemMessageAsPRW.ResponseMessage);
+            Assert.AreEqual("No record matches given ID", outputGetRemovedItemMessageAsPRW.ResponseMessage);
             Assert.AreEqual(HTTPResponseCodes.HTTP_NOT_FOUND, outputGetRemovedItemMessageAsPRW.ResponseHTMLType);
         }
 
-        // TEST: Null Order ID
         [Test] 
         public async Task TestRemoveOrderNullID()
         {
             // Arrange
-            string nullOrderID = "";
+            string nullOrderID = null;
 
             // Act
             OrdersProvider ordersProvider = new OrdersProvider(_mockOrdersRepository.Object, _mockHttpClient.Object);
@@ -83,7 +80,7 @@ namespace OrdersAPITests.OrdersProviderTests
                 ordersProvider.RemoveOrder(nullOrderID);
 
             // Asserts
-            Assert.AreEqual("No Order Exists", outputGetRemovedItemMessageAsPRW.ResponseMessage);
+            Assert.AreEqual("No order exists, null given", outputGetRemovedItemMessageAsPRW.ResponseMessage);
             Assert.AreEqual(HTTPResponseCodes.HTTP_NOT_FOUND, outputGetRemovedItemMessageAsPRW.ResponseHTMLType);
         }
 
@@ -104,10 +101,7 @@ namespace OrdersAPITests.OrdersProviderTests
 
         private List<OrderDTO> CreateBoxItems()
         {
-            // Arrange
             List<OrderDTO> order = new List<OrderDTO>();
-
-
             while (order.Count != 6)
             {
                     OrderDTO item = new OrderDTO

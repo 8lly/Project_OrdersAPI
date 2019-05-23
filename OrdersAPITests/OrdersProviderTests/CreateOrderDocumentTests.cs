@@ -21,8 +21,7 @@ namespace OrdersAPITests.OrdersProviderTests
         {
             _mockOrderRepository = new Mock<IOrdersRepository>();
         }
-
-        // Test: Create a valid order document
+        
         [Test]
         public void TestCreateValidOrder()
         {
@@ -39,7 +38,6 @@ namespace OrdersAPITests.OrdersProviderTests
             Assert.AreEqual("New item Inserted", outputCreateOrderDocumentsAsProviderResponseWrapper.ResponseMessage);
         }
 
-        // Test: Create a invalid order document
         [Test]
         public void TestCreateInvalidOrder()
         {
@@ -55,13 +53,13 @@ namespace OrdersAPITests.OrdersProviderTests
             Assert.AreEqual("Some fields are completed incorrect. Please re-enter values again.", outputCreateOrderDocumentsAsProviderResponseWrapper.ResponseMessage);
         }
 
-        // Test: Create a null order document 
         [Test]
         public void TestCreateNullOrder()
         {
             // Arrange 
             Order newNullTestOrder = null;
 
+            // Act
             OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object, null);
             ProviderResponseWrapper outputCreateOrderDocumentsAsProviderResponseWrapper = orderProvider.CreateOrderDocument(newNullTestOrder);
 

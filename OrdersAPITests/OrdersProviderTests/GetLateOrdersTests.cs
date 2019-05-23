@@ -28,7 +28,6 @@ namespace OrdersAPITests.OrdersProviderTests
         {
             // Act
             _mockOrderRepository.Setup(x => x.GetLateOrders()).Returns(CreateOrderDTOList(1));
-            // Is this meant to be orderprovider or orderscontroller
             OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object, null);
             ProviderResponseWrapper outputGetOrdersAsProviderResponseWrapper = orderProvider.GetLateOrders();
             List<OrderDTO> outputOrderList = JsonConvert.DeserializeObject<List<OrderDTO>>(outputGetOrdersAsProviderResponseWrapper.ResponseMessage);
@@ -44,7 +43,6 @@ namespace OrdersAPITests.OrdersProviderTests
         {
             // Act
             _mockOrderRepository.Setup(x => x.GetLateOrders()).Returns(CreateOrderDTOList(1000));
-            // Is this meant to be orderprovider or orderscontroller
             OrdersProvider orderProvider = new OrdersProvider(_mockOrderRepository.Object, null);
             ProviderResponseWrapper outputGetOrdersAsProviderResponseWrapper = orderProvider.GetLateOrders();
             List<OrderDTO> outputOrderList = JsonConvert.DeserializeObject<List<OrderDTO>>(outputGetOrdersAsProviderResponseWrapper.ResponseMessage);

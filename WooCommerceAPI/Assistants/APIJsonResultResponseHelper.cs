@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace OrdersAPI.Assistants
 {
+    // Create JSONResult message
     public class APIJsonResultResponseHelper
     { 
         public JsonResult CreateJsonResultResponse(ProviderResponseWrapper providerResponse)
